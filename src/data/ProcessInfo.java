@@ -1,7 +1,8 @@
+package data;
+
 public class ProcessInfo {
     private int proId;
     private String proName;
-    public object migra;
 	public String getName() {
 		
 		return proName;

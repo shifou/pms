@@ -18,7 +18,7 @@ public class TransactionalFileOutputStream extends OutputStream implements Seria
 	private boolean migrated;
 	
 	public TransactionalFileOutputStream(String fileName){
-		this.file = new File(fileName); //open a new file or open existing file with the given name???
+		this.file = new File(fileName);
 		this.fileOffset = 0;
 		this.migrated = false;
 	}
@@ -43,3 +43,4 @@ public class TransactionalFileOutputStream extends OutputStream implements Seria
 	}
 
 }
+

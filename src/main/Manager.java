@@ -1,4 +1,5 @@
 package main;
+
 import main.Server;
 import data.*;
 import java.io.BufferedReader;
@@ -11,6 +12,8 @@ import java.util.TimerTask;
 import java.util.concurrent.*;
 import java.net.Socket;
 import java.net.SocketException;
+
+
 public class Manager {
 	Server server;
 	private int port;
