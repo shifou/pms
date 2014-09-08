@@ -1,3 +1,5 @@
-public enum msgType {
+package data;
+
+public enum Message {
 	
 }

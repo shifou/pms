@@ -6,5 +6,4 @@ public class Slave implements Runnable {
 	public void run() {
 				
 	}
-
 }
