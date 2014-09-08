@@ -2,6 +2,7 @@ package main;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.ServerSocket;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import data.ProcessInfo;
@@ -9,8 +10,8 @@ public class Server implements Runnable{
 	private int conId;
 	private int port;
 	boolean running;
-	private ConcurrentHashMap<Integer,Socket> slaves;
-	private ConcurrentHashMap<Integer,ProcessInfo> processes;
+	public ConcurrentHashMap<Integer,Socket> slaves;
+	public ConcurrentHashMap<Integer,Connection> processes;
     ServerSocket serverSocket;
     public Server(int portNum){
         port = portNum;
@@ -34,8 +35,9 @@ public class Server implements Runnable{
              Socket slaveSocket = serverSocket.accept();
              System.out.println("slave: "+slaveSocket.getInetAddress()+":"+slaveSocket.getPort()+" join in");
              slaves.put(conId, slaveSocket);
-             manageService slaveService = new manageService(conId, slaveSocket); 
+             Connection slaveService = new Connection(conId, slaveSocket); 
              new Thread(slaveService).start();
+             processes.put(conId, slaveService);
              conId++;
          } 
      }catch(IOException e){
@@ -49,25 +51,31 @@ public class Server implements Runnable{
       e.printStackTrace();
       System.out.println("socket Server failed to close");
   }
-      
   }
   
   public void stop(){
       running = false;
   }
 public int slaveSize() {
-	// TODO Auto-generated method stub
-	return 0;
+	
+	return slaves.size();
 }
 public int processSize() {
-	// TODO Auto-generated method stub
-	return 0;
+	
+	return processes.size();
 }
-public ConcurrentHashMap<Integer, ProcessInfo> getProcess() {
-	// TODO Auto-generated method stub
-	return null;
+public ConcurrentHashMap<Integer, Vector<ProcessInfo> > getProcess() {
+	ConcurrentHashMap<Integer, Vector<ProcessInfo>> info =new ConcurrentHashMap<Integer, Vector<ProcessInfo>>();
+	for(Integer one: processes.keySet())
+	{
+		info.put(one, processes.get(one).getProcessInfos());
+	}
+	return info;
 }
 public ConcurrentHashMap<Integer, Socket> getSlaves() {
+	return slaves;
+}
+public ConcurrentHashMap<Integer, ProcessInfo> getProcessOfSlave(int slaveId) {
 	// TODO Auto-generated method stub
 	return null;
 }

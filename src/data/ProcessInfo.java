@@ -11,5 +11,10 @@ public class ProcessInfo {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public String getId() {
+		// TODO Auto-generated method stub
+		return proId;
+	}
 	
 }

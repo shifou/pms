@@ -1,6 +1,7 @@
 package main;
 import main.Server;
 import data.*;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,6 +9,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Vector;
 import java.util.concurrent.*;
 import java.net.Socket;
 import java.net.SocketException;
@@ -77,10 +79,12 @@ public class Manager {
         if(0 == server.processSize())
             System.out.println("no process information");
         else{
-        	ConcurrentHashMap<Integer,ProcessInfo> proList = server.getProcess();
+        	ConcurrentHashMap<Integer,Vector<ProcessInfo>> proList = server.getProcess();
             for(int i : proList.keySet()){
-                ProcessInfo info = proList.get(i);
-                System.out.println("Process ID: "+i+" Process Name: "+info.getName()+" Process Status: "+info.getStatus());
+            	System.out.println("slave Id: "+i);
+                Vector<ProcessInfo> info = proList.get(i);
+                for(int j=0;j<info.size();j++)
+                System.out.println("--Process ID: "+info.get(j).getId()+" Process Name: "+info.get(j).getName()+" Process Status: "+info.get(j).getStatus());
             }
                 
         }
@@ -111,19 +115,19 @@ public class Manager {
         }
         
         
-        ConcurrentHashMap<Integer,ProcessInfo> proList = server.getProcess();
+        ConcurrentHashMap<Integer,ProcessInfo> proList = server.getProcessOfSlave(slaveId);
         
         if(proList.containsKey(slaveId)){
             try{
                 
             }catch (IOException e) {
                 e.printStackTrace();
-                System.out.println("start Command sent failed, remove slave "+hold);
-                removeNode(slave);
+                System.out.println("start Command sent failed, remove slave "+slaveId);
+                removeNode(slaveId);
             }
         }
         else{
-            System.out.println("there is no server for slaveId "+hold);
+            System.out.println("there is no server for slaveId "+slaveId);
         }
             
     }
@@ -261,6 +265,7 @@ public class Manager {
     }
     
     public void startTimer(){
+    	 System.out.println("--heartbeat--");
         Timer timer = new Timer(true);
         TimerTask task = new TimerTask(){
             public void run(){
@@ -268,7 +273,7 @@ public class Manager {
             }
         };
         timer.schedule(task, 0, 5000);
-        System.out.println("start the heartbeat");
+       
         
     }
     public static void main(String[] args){
@@ -283,11 +288,11 @@ public class Manager {
            System.out.println("invalid port number");
            return;
         }
-        Manager manager = new Manager();
+        Manager manager = new Manager(port);
         if(manager.startServer())
         {
         	System.out.println("--start manager--");
-        //manager.startMoniterTimer();
+            manager.startTimer();
         	manager.startConsole();
         }
         else
