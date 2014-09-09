@@ -5,13 +5,16 @@ import java.net.ServerSocket;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import data.Message;
 import data.ProcessInfo;
 public class Server implements Runnable{
 	private int conId;
 	private int port;
 	boolean running;
 	public ConcurrentHashMap<Integer,Socket> slaves;
-	public ConcurrentHashMap<Integer,Connection> processes;
+	public ConcurrentHashMap<Integer,Integer> slaveStatus;
+	public ConcurrentHashMap<Integer,Connection> con;
+	public ConcurrentHashMap<Integer,Vector<ProcessInfo>> processes;
     ServerSocket serverSocket;
     public Server(int portNum){
         port = portNum;
@@ -37,7 +40,7 @@ public class Server implements Runnable{
              slaves.put(conId, slaveSocket);
              Connection slaveService = new Connection(conId, slaveSocket); 
              new Thread(slaveService).start();
-             processes.put(conId, slaveService);
+             con.put(conId, slaveService);
              conId++;
          } 
      }catch(IOException e){
@@ -76,8 +79,17 @@ public ConcurrentHashMap<Integer, Socket> getSlaves() {
 	return slaves;
 }
 public ConcurrentHashMap<Integer, ProcessInfo> getProcessOfSlave(int slaveId) {
+	ConcurrentHashMap<Integer, ProcessInfo> info =new ConcurrentHashMap<Integer, ProcessInfo>();
+	
+	return info;
+}
+public ConcurrentHashMap<Integer, Integer> getSlaveStatus() {
+	
+	return slaveStatus;
+}
+public void send(Integer one, Message msg) {
 	// TODO Auto-generated method stub
-	return null;
+	
 }
 
 

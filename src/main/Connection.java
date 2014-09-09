@@ -45,12 +45,10 @@ public class Connection implements Runnable {
 				case START:
 					handleSTART(receiveMessage);
 					break;
-				case MIGARATESOURCERES:
-					handleMigrateSourceRes(receiveMessage);
+				case MIGRATEBEGIN:
+					handleMigrate(receiveMessage);
 					break;
-				case MIGRATETARGETRES:
-					hanleMigrateTargetRes(receiveMessage);
-					break;
+
 				case KILL:
 					handleKILL(receiveMessage);
 					break;
@@ -62,6 +60,11 @@ public class Connection implements Runnable {
 
 		}
 
+	}
+
+	private void handleMigrate(Message receiveMessage) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private void handleSTART(Message receiveMessage) {

@@ -1,5 +1,4 @@
 package main;
-
 import main.Server;
 import data.*;
 
@@ -14,11 +13,10 @@ import java.util.Vector;
 import java.util.concurrent.*;
 import java.net.Socket;
 import java.net.SocketException;
-
-
 public class Manager {
 	Server server;
 	private int port;
+	public Timer monitor;
     private BufferedReader console;
     
     public Manager(int listenPort){
@@ -60,6 +58,7 @@ public class Manager {
                     break;
                 case "shutdown":
                     terminate();
+                    System.out.println("terminating...");
                     System.exit(0);
                     break;
                 default:
@@ -229,15 +228,25 @@ public class Manager {
     private void handleHelp(String[] line){
         System.out.println("Commands List:");
         System.out.println("ls : list all the slave node in the system");
-        System.out.println("ps : list all the processes");
-        System.out.println("start <process name> <args[]> <worker id> : start the process on the designated worker");
-        System.out.println("migrate <process id> <source id> <target id> : migrate process from source to target worker");
-        System.out.println("kill <process id> : kill the process");
+        System.out.println("ps : list all the processes that slave have");
+        System.out.println("start <process name> <args[]> <slaveId> : start the process on one slave");
+        System.out.println("migrate <processId> <source slaveId> <target slaveId> : migrate process from one slave to another slave");
+        System.out.println("kill <processId> <slaveId>: kill the process in slave");
     }
-    public void removeNode(int id){
-       
+    public void remove(int one){
+    	
+		try {
+			server.slaves.remove(one);
+			server.con.get(one).stop();
+			server.con.remove(one);
+			server.processes.remove(one);
+			server.slaveStatus.remove(one);
+			server.slaves.get(one).close();
+		} catch (IOException e) {
+			System.err.println("remove error");
+			e.printStackTrace();
+		}
     }
-    
     private boolean startServer(){
         try
         {
@@ -255,6 +264,8 @@ public class Manager {
         
         try{
             console.close();
+            monitor.cancel();
+            System.gc();
         }catch(IOException e){
             
         }
@@ -263,19 +274,31 @@ public class Manager {
     }
     
     private void checkAlive(){
-        
-        
+    	ConcurrentHashMap<Integer,Integer> status = server.getSlaveStatus();
+        for(Integer one : status.keySet())
+        {
+        	if(status.get(one)==0)
+        	{
+        		System.out.println("slave Id: "+one+" disconnected, abondon all related tasks");
+        		remove(one);
+        		continue;
+        	}
+        	status.put(one, 0);
+        	/* unfinished send heart msg*/
+        	Message msg=new Message();
+        	server.send(one,msg);
+        }
     }
     
     public void startTimer(){
     	 System.out.println("--heartbeat--");
-        Timer timer = new Timer(true);
+        monitor = new Timer(true);
         TimerTask task = new TimerTask(){
             public void run(){
                 checkAlive();
             }
         };
-        timer.schedule(task, 0, 5000);
+        monitor.schedule(task, 0, 5000);
        
         
     }
@@ -299,11 +322,6 @@ public class Manager {
         	manager.startConsole();
         }
         else
-        	 System.out.println("start server error");
-        
-        
-        
-        
+        	 System.out.println("start server error");     
     }
-
 }
