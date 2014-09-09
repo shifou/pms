@@ -1,4 +1,5 @@
 package main;
+
 import main.Server;
 import data.*;
 
@@ -13,6 +14,8 @@ import java.util.Vector;
 import java.util.concurrent.*;
 import java.net.Socket;
 import java.net.SocketException;
+
+
 public class Manager {
 	Server server;
 	private int port;
