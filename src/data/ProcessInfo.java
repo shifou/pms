@@ -1,6 +1,6 @@
 package data;
 
-<<<<<<< HEAD
+
 import process.MigratableProcess;
 
 
@@ -18,13 +18,7 @@ public class ProcessInfo {
     public void setName(String name){
     	proName= name;
     }
-=======
-public class ProcessInfo {
-    private int proId;
-    private String proName;
->>>>>>> c048ffdfae0c5ea1ad179689226139e44abc2d3e
 	public String getName() {
-		
 		return proName;
 	}
 	public void setStatus(Status st){
