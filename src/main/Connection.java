@@ -77,8 +77,8 @@ public class Connection implements Runnable {
 	public int send(Message mes) throws IOException {
 		try
 		{
-		objOutput.writeObject(mes);
-		objOutput.flush();
+			objOutput.writeObject(mes);
+			objOutput.flush();
 		}catch(Exception e)
 		{
 			return 0;

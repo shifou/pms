@@ -1,18 +1,11 @@
 package data;
-
-
 public class Message {
-public int id;
-public enum msgType {
-	START,
-	MIGRATE,
-	KILL,
-	SUCCESS,
-}
+	public int id;
 
-public String getResponType() {
-	// TODO Auto-generated method stub
-	return null;
-}
+	public msgType type;
+	public msgType getResponType() {
+		// TODO Auto-generated method stub
+		return type;
+	}
 
 }

@@ -1,19 +1,36 @@
+package data;
+
+import process.MigratableProcess;
+
+
 public class ProcessInfo {
     private int proId;
     private String proName;
-    public object migra;
+    private Status status;
+    public MigratableProcess processObject;
+    public ProcessInfo(String name, int id, Status now)
+    {
+    	proName= name;
+    	proId = id;
+    	status= now;
+    }
+    public void setName(String name){
+    	proName= name;
+    }
 	public String getName() {
 		
 		return proName;
 	}
-
-	public Object getStatus() {
-		// TODO Auto-generated method stub
-		return null;
+	public void setStatus(Status st){
+    	status= st;
+    }
+	public Status getStatus() {
+		return status;
 	}
-
-	public String getId() {
-		// TODO Auto-generated method stub
+	public void setId(int id){
+    	proId= id;
+    }
+	public int getId() {
 		return proId;
 	}
 	
