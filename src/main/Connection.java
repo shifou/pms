@@ -1,12 +1,14 @@
 package main;
 
 import data.Message;
+import data.ProcessInfo;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 
@@ -26,6 +28,7 @@ public class Connection implements Runnable {
 		objOutput = new ObjectOutputStream(slaveSocket.getOutputStream());
 		objOutput.flush();
 		objInput = new ObjectInputStream(slaveSocket.getInputStream());
+		running=true;
 		
 	}
 
@@ -37,12 +40,17 @@ public class Connection implements Runnable {
 				try {
 					receiveMessage = (Message) objInput.readObject();
 				} catch (ClassNotFoundException e) {
+					System.out.println("read message error");
 					continue;
 				}
 				System.out.println("slave receive message: "+ receiveMessage.getResponType());
 				switch (receiveMessage.getResponType()) {
 				case CONNECT:
+					
 					ipaddr=receiveMessage.getIp();
+					Manager.manager.slaveStatus.put(slaveId, 1);
+					ConcurrentHashMap<Integer, ProcessInfo> hold= new ConcurrentHashMap<Integer, ProcessInfo>();
+					Manager.manager.processes.put(slaveId, hold);
 					break;
 				case STARTFAIL:
 				case STARTDONE:
@@ -60,8 +68,10 @@ public class Connection implements Runnable {
 					break;
 				case HEARTACK:
 					handleHEART(receiveMessage);
+					break;
 				default:
 					System.out.println("unknow type");
+					break;
 				}
 			}
 		} catch (IOException e) {
@@ -132,6 +142,7 @@ public class Connection implements Runnable {
 	public int send(Message mes) throws IOException {
 		try
 		{
+			System.out.println("send to "+slaveId+"\t"+mes.getResponType());
 			objOutput.writeObject(mes);
 			objOutput.flush();
 		}catch(Exception e)

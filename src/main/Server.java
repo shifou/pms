@@ -48,6 +48,7 @@ public class Server implements Runnable{
 			try {
 				slaveService = new Connection(conId, slaveSocket);
 	            new Thread(slaveService).start();
+	            System.out.println("begin send");
 	            Manager.manager.con.put(conId, slaveService);
 	            Message msg= new Message(conId,msgType.CONNECT);
 	            Manager.manager.send(conId, msg);

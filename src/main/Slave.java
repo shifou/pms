@@ -82,10 +82,12 @@ public class Slave {
 					break;
 				case HEART:
 					s.handlePollingReq(recvMessage);
+					break;
 				default:
 					System.out
 							.println("Unrecognized message received from server at Slave: "
 									+ Integer.valueOf(s.slaveID).toString());
+					break;
 				}
 			} catch (IOException e) {
 
@@ -167,6 +169,7 @@ public class Slave {
 		try {
 			m.setDestIP(InetAddress.getLocalHost());
 			this.serverOut.writeObject(m);
+			this.serverOut.flush();
 		} catch (IOException e){
 			
 		} 

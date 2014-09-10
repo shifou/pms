@@ -241,11 +241,6 @@ public class Manager {
 			}
 			
 			send(sourceId, msg);
-	
-        
-
-
-
     }
     
     private void handleHelp(String[] line){
@@ -260,8 +255,8 @@ public class Manager {
     	
 		try {
 			
-			slaves.remove(one);
 			slaves.get(one).close();
+			slaves.remove(one);
 			con.get(one).stop();
 			con.remove(one);
 			processes.remove(one);
@@ -288,7 +283,7 @@ public class Manager {
         
         try{
             console.close();
-           // monitor.cancel();
+            monitor.cancel();
             System.gc();
         }catch(IOException e){
             
@@ -298,7 +293,9 @@ public class Manager {
     }
     
     private void checkAlive(){
+    	
     	ConcurrentHashMap<Integer,Integer> status = getSlaveStatus();
+    	//System.out.println("check: "+status.size());
         for(Integer one : status.keySet())
         {
         	if(status.get(one)==0)
@@ -321,7 +318,6 @@ public class Manager {
     		e.printStackTrace();
     		return 0;
     	}
-    	
     }
     public void startTimer(){
     	 System.out.println("--heartbeat--");
@@ -332,18 +328,13 @@ public class Manager {
             }
         };
         monitor.schedule(task, 0, 5000);
-       
-        
     }
     public int slaveSize() {
-    	
     	return slaves.size();
-       
     }
     public int processSize() {
     	int sum=0;
     	for(Integer one : processes.keySet()) sum+=processes.get(one).size();
-        
     	return sum;
     }
     public ConcurrentHashMap<Integer, Socket> getSlaves() {
@@ -384,7 +375,7 @@ public class Manager {
         if(manager.startServer())
         {
         	System.out.println("--start manager--");
-            //manager.startTimer();
+            manager.startTimer();
         	manager.startConsole();
         }
         else
