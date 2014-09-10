@@ -3,8 +3,6 @@ package process;
 import java.io.PrintStream;
 import java.io.EOFException;
 import java.io.DataInputStream;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.lang.Thread;
 import java.lang.InterruptedException;
@@ -14,6 +12,10 @@ import transIO.TransactionalFileOutputStream;
 
 public class GrepProcess implements MigratableProcess
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5827004168052851878L;
 	private TransactionalFileInputStream  inFile;
 	private TransactionalFileOutputStream outFile;
 	private String query;
