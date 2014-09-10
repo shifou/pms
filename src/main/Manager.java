@@ -162,7 +162,7 @@ public class Manager {
         ProcessInfo procInfo = proList.get(procId);
         if (procInfo.getStatus()==Status.RUNNING) {
                 
-                Message msg = new Message(slaveId,procId,msgType.KILL);
+                Message msg = new Message(procId,msgType.KILL);
 				send(slaveId, msg);
                 
                 

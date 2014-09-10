@@ -1,6 +1,7 @@
 package data;
 
 import java.io.Serializable;
+import java.net.InetAddress;
 
 public class Message implements Serializable {
 	/**
@@ -9,32 +10,31 @@ public class Message implements Serializable {
 	private static final long serialVersionUID = -2553768344528279980L;
 	
 	private ProcessInfo proInfo;
-	private int tempId;
 	private int proId;
 	private msgType type;
 	private String statusInfo;
 	private int sourceID;
 	private int destID;
-	private String destHost;
+	private InetAddress destIP;
 	private int destPort;
+	private int tempID;
 	
 	public Message(msgType type){
 		this.type = type;
 	}
 	// kill message
-	public Message (int conId,int killproId, msgType tp)
+	public Message (int killproId, msgType tp)
 	{
 		proId=killproId;
-		tempId=conId;
 		type=tp;
 	}
-	// assign conId Message
-	public Message (int conId,msgType tp)
+	// assign slaveID Message
+	public Message (msgType tp, int slaveID)
 	{
-		tempId=conId;
+		tempID = slaveID;
 		type=tp;
 	}
-	// migrate Noti
+	// migrate notification
 	public Message(int sourceId, int targetId, ProcessInfo process) {
 		proInfo=process;
 		sourceID=sourceId;
@@ -55,12 +55,12 @@ public class Message implements Serializable {
 		this.destPort = destPort;
 	}
 
-	public String getDestHost() {
-		return this.destHost;
+	public InetAddress getDestHost() {
+		return this.destIP;
 	}
 
-	public void setDestHost(String destHost) {
-		this.destHost = destHost;
+	public void setDestIP(InetAddress destIP) {
+		this.destIP = destIP;
 	}
 
 	public int getDestID() {
@@ -111,7 +111,7 @@ public class Message implements Serializable {
 
 	public Integer getHeartId() {
 		
-		return tempId;
+		return tempID;
 	}
 
 }
