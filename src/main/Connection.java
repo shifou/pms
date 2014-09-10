@@ -15,7 +15,7 @@ public class Connection implements Runnable {
 
 	private int slaveId;
 	private Socket socket;
-	private boolean running;
+	private volatile boolean running;
 
 	private ObjectInputStream objInput;
 	private ObjectOutputStream objOutput;
@@ -32,44 +32,59 @@ public class Connection implements Runnable {
 	public void run() {
 		try {
 			Message receiveMessage;
-
 			while (running) {
 				try {
 					receiveMessage = (Message) objInput.readObject();
 				} catch (ClassNotFoundException e) {
 					continue;
 				}
-				System.out.println("worker message received: id "
-						+ receiveMessage.getResponType());
+				System.out.println("slave receive message: "+ receiveMessage.getResponType());
 				switch (receiveMessage.getResponType()) {
-				case START:
+				case STARTFAIL:
+				case STARTDONE:
+				case FINISH:
 					handleSTART(receiveMessage);
 					break;
-				case MIGRATEBEGIN:
-					handleMigrate(receiveMessage);
+				case MIGRATEBEGINFAIL:
+				case MIGRATEDONE:
+				case MIGRATEFAIL:
+					handleMIGRATE(receiveMessage);
 					break;
-
-				case KILL:
+				case KILLDONE:
+				case KILLFAIL:
 					handleKILL(receiveMessage);
 					break;
 				default:
-					System.out.println("unrecagnized message");
+					System.out.println("unknow type");
 				}
 			}
 		} catch (IOException e) {
+			System.out.println("read message error in connection");
 
 		}
 
 	}
 
-	private void handleMigrate(Message receiveMessage) {
+	private void handleMIGRATE(Message receiveMessage) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	private void handleSTART(Message receiveMessage) {
-		// TODO Auto-generated method stub
 		
+		switch (receiveMessage.getResponType()) {
+		case STARTFAIL:
+			System.out.println("slave "+slaveId+" start process "+receiveMessage.getProcessinfo().getId()+" fail "+receiveMessage.getData());
+			break;
+		case STARTDONE:
+			Manager.manager.slaves.put(slaveId, socket);
+			int hold = receiveMessage.getProcessinfo().getId();
+			Manager.manager.addProcess(slaveId, hold);
+			System.out.println("slave "+slaveId+" start process "+hold+" success");
+			break;
+		case FINISH:
+			Manager.manager.removeProcess(slaveId, receiveMessage.getProcessinfo().getId());
+		}
 	}
 
 	private void handleKILL(Message receiveMessage) {
@@ -92,10 +107,4 @@ public class Connection implements Runnable {
 	public void stop() {
 		running = false;
 	}
-
-	public Vector<ProcessInfo> getProcessInfos() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

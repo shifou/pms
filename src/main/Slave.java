@@ -1,5 +1,6 @@
 package main;
 
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -88,7 +89,6 @@ public class Slave implements Runnable {
 		p.kill();
 		this.processes.remove(pI.getId());
 		
-	}
 
 	private void handleStartProcess(Message received) {
 		ProcessInfo pI = received.getProcessInfo();

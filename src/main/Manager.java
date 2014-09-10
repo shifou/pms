@@ -18,7 +18,10 @@ public class Manager {
 	private int port;
 	public Timer monitor;
     private BufferedReader console;
-    
+    public ConcurrentHashMap<Integer,Socket> slaves;
+	public ConcurrentHashMap<Integer,Integer> slaveStatus;
+	public ConcurrentHashMap<Integer,Connection> con;
+	public ConcurrentHashMap<Integer,ConcurrentHashMap<Integer, ProcessInfo>> processes;
     public Manager(int listenPort){
         port = listenPort;
         console = new BufferedReader(new InputStreamReader(System.in));
@@ -68,25 +71,25 @@ public class Manager {
     }
     
     private void handleLs(String[] line){
-        if(0 == server.slaveSize())
+        if(0 == slaveSize())
             System.out.println("no slave in system");
         else{
-        	ConcurrentHashMap<Integer,Socket> slaveList = server.getSlaves();
+        	ConcurrentHashMap<Integer,Socket> slaveList = getSlaves();
             for(int i : slaveList.keySet())
                 System.out.println("Slave ID: "+i+"  IP Address: "+slaveList.get(i).getInetAddress());
         }
     }
     
     private void handlePs(String[] line){
-        if(0 == server.processSize())
+        if(0 == processSize())
             System.out.println("no process information");
         else{
-        	ConcurrentHashMap<Integer,Vector<ProcessInfo>> proList = server.getProcess();
+        	ConcurrentHashMap<Integer,ConcurrentHashMap<Integer,ProcessInfo>> proList = getProcess();
             for(int i : proList.keySet()){
             	System.out.println("slave Id: "+i);
-                Vector<ProcessInfo> info = proList.get(i);
-                for(int j=0;j<info.size();j++)
-                System.out.println("--Process ID: "+info.get(j).getId()+" Process Name: "+info.get(j).getName()+" Process Status: "+info.get(j).getStatus());
+            	ConcurrentHashMap<Integer,ProcessInfo> info = proList.get(i);
+                for(Integer one: info.keySet())
+                System.out.println("--Process ID: "+info.get(one).getId()+" Process Name: "+info.get(one).getName()+" Process Status: "+info.get(one).getStatus());
             }
                 
         }
@@ -106,9 +109,11 @@ public class Manager {
             return;
             
         }
-        if(server.slaves.containsKey(slaveId)==false){
+
+        if(slaves.containsKey(slaveId)==false){
             System.out.println("there is no slave with id number "+slaveId);
             return;
+        
         }
        
         String[] args = new String[line.length - 3];
@@ -117,22 +122,13 @@ public class Manager {
         }
         
         
-        ConcurrentHashMap<Integer,ProcessInfo> proList = server.getProcessOfSlave(slaveId);
+       
+            Message msg = new Message();
+			send(slaveId, msg);
+        }
         
-        if(proList.containsKey(slaveId)){
-            try{
-                
-            }catch (IOException e) {
-                e.printStackTrace();
-                System.out.println("start Command sent failed, remove slave "+slaveId);
-                removeNode(slaveId);
-            }
-        }
-        else{
-            System.out.println("there is no server for slaveId "+slaveId);
-        }
             
-    }
+    
     
     private void handleKillProcess(String[] line){
         int procId=-1;
@@ -140,28 +136,32 @@ public class Manager {
             System.out.println("invalid argument number, please type help for more information");
             return;
         }
+        int slaveId;
         try{
-            procId=Integer.valueOf(line[1]);
+            slaveId = Integer.valueOf(line[1]);
+            
         }catch(Exception e){
-            System.out.println("the worker id is not a number");
+            System.out.println("the slave id is not a number");
             return;
+            
         }
-        ConcurrentHashMap<Integer,ProcessInfo> proList = server.getProcess();
+
+        if(slaves.containsKey(slaveId)==false){
+            System.out.println("there is no slave with id number "+slaveId);
+            return;
+        
+        }
+        ConcurrentHashMap<Integer,ProcessInfo> proList = getProcessOfSlave(slaveId);
         
         if(false==proList.containsKey(procId)){
-            System.out.println("no such process");
+            System.out.println("no such process in the slave");
             return;
         }
         ProcessInfo procInfo = proList.get(procId);
-        if (procInfo.getStatus().equals(ProcessInfo.Status.RUNNING)) {
+        if (procInfo.getStatus()==Status.RUNNING) {
                 
-                try{
-                   
-                }catch (IOException e) {
-                    e.printStackTrace();
-                    System.out.println("Kill Command sent failed, remove worker "+slaveId);
-                    removeNode(slaveId);
-                }
+                Message msg = new Message();
+				send(slaveId, msg);
                 
                 
                 /*update the process status when receive the reply from worker*/
@@ -186,39 +186,45 @@ public class Manager {
         try{
             sourceId=Integer.valueOf(line[2]);
         }catch(Exception e){
-            System.out.println("the source worker id is not a number");
+            System.out.println("the source slave id is not a number");
             return;
         }
         try{
             targetId=Integer.valueOf(line[3]);
         }catch(Exception e){
-            System.out.println("the target worker id is not a number");
+            System.out.println("the target slave id is not a number");
+            return;
+        }
+       
+        if(slaves.containsKey(sourceId)==false){
+            System.out.println("there is no source slave with id number "+sourceId);
+            return;
+        }
+        if(slaves.containsKey(targetId)==false){
+            System.out.println("there is no target slave with id number "+targetId);
             return;
         }
         
-        if(!proList.containsKey(procId)){
-            System.out.println("no process with "+procId+"exist");
-            return;
-        }
         
-        if(!proList.containsKey(sourceId)){
-            System.out.println("the source worker "+sourceId+" does not exist");
+        ConcurrentHashMap<Integer,ProcessInfo> proList = getProcessOfSlave(sourceId);
+        
+        if(false==proList.containsKey(procId)){
+            System.out.println("no such process in the source slave");
             return;
         }
+       
      
-        if(!proList.containsKey(targetId)){
-            System.out.println("the target worker "+targetId+" does not exist");
-            return;
-        }
-     
         
-        try{
-          
-        }catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Migrate Command sent failed, remove worker "+sourceId);
-            removeNode(sourceId);
-        }
+        Message msg = new Message();
+			send(sourceId, msg);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			msg=new Message();
+			send(targetId,msg);
         
 
 
@@ -236,12 +242,13 @@ public class Manager {
     public void remove(int one){
     	
 		try {
-			server.slaves.remove(one);
-			server.con.get(one).stop();
-			server.con.remove(one);
-			server.processes.remove(one);
-			server.slaveStatus.remove(one);
-			server.slaves.get(one).close();
+			
+			slaves.remove(one);
+			slaves.get(one).close();
+			con.get(one).stop();
+			con.remove(one);
+			processes.remove(one);
+			slaveStatus.remove(one);
 		} catch (IOException e) {
 			System.err.println("remove error");
 			e.printStackTrace();
@@ -264,7 +271,7 @@ public class Manager {
         
         try{
             console.close();
-            monitor.cancel();
+           // monitor.cancel();
             System.gc();
         }catch(IOException e){
             
@@ -274,7 +281,7 @@ public class Manager {
     }
     
     private void checkAlive(){
-    	ConcurrentHashMap<Integer,Integer> status = server.getSlaveStatus();
+    	ConcurrentHashMap<Integer,Integer> status = getSlaveStatus();
         for(Integer one : status.keySet())
         {
         	if(status.get(one)==0)
@@ -286,10 +293,20 @@ public class Manager {
         	status.put(one, 0);
         	/* unfinished send heart msg*/
         	Message msg=new Message();
-        	server.send(one,msg);
+        	send(one,msg);
         }
     }
-    
+    public int send(Integer one, Message msg) {
+    	try {
+    			con.get(one).send(msg);
+    		return 1;
+    	} catch (IOException e) {
+    		System.out.println("send error");
+    		e.printStackTrace();
+    		return 0;
+    	}
+    	
+    }
     public void startTimer(){
     	 System.out.println("--heartbeat--");
         monitor = new Timer(true);
@@ -302,6 +319,38 @@ public class Manager {
        
         
     }
+    public int slaveSize() {
+    	
+    	return slaves.size();
+       
+    }
+    public int processSize() {
+    	int sum=0;
+    	for(Integer one : processes.keySet()) sum+=processes.get(one).size();
+        
+    	return sum;
+    }
+    public ConcurrentHashMap<Integer, Socket> getSlaves() {
+    	
+    		return slaves;
+       
+    }
+    public ConcurrentHashMap<Integer, ProcessInfo> getProcessOfSlave(int slaveId) {
+
+    		return processes.get(slaveId);
+        
+    }
+    public ConcurrentHashMap<Integer, Integer> getSlaveStatus() {
+    	
+    	return slaveStatus;
+      
+    }
+    public ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, ProcessInfo>> getProcess() {
+    	
+    	return processes;
+        
+    }
+    public static Manager manager;
     public static void main(String[] args){
         if(args.length != 1){
             System.out.println("wrong arguments, usage: ./Manager <port number>");
@@ -314,14 +363,26 @@ public class Manager {
            System.out.println("invalid port number");
            return;
         }
-        Manager manager = new Manager(port);
+        manager = new Manager(port);
         if(manager.startServer())
         {
         	System.out.println("--start manager--");
-            manager.startTimer();
+            //manager.startTimer();
         	manager.startConsole();
         }
         else
         	 System.out.println("start server error");     
     }
+
+	public void addProcess(int slaveId, int id,ProcessInfo info) {
+		ConcurrentHashMap<Integer, ProcessInfo> hold= processes.get(slaveId);
+		hold.put(id, info);
+		
+		
+	}
+
+	public void removeProcess(int slaveId, int id) {
+		// TODO Auto-generated method stub
+		
+	}
 }
