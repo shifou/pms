@@ -7,10 +7,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.Socket;
-import java.util.Vector;
 
-import data.ProcessInfo;
+
+
 
 public class Connection implements Runnable {
 	private InetAddress ipaddr;
@@ -87,6 +86,8 @@ public class Connection implements Runnable {
 			System.out.println("slave "+slaveId+" migrate process "+hold+" to slave "+receiveMessage.getDestID()+" fail FOR"+receiveMessage.getStatusInfo());
 			//Manager.manager.getProcessOfSlave(slaveId)
 			break;
+		default:
+			break;
 		}
 	}
 
@@ -106,6 +107,8 @@ public class Connection implements Runnable {
 			System.out.println("slave "+slaveId+" finish process "+hold);
 			Manager.manager.removeProcess(slaveId, hold);
 			break;
+		default:
+			break;
 		}
 	}
 
@@ -119,6 +122,8 @@ public class Connection implements Runnable {
 		case KILLFAIL:
 			System.out.println("slave "+slaveId+" start process "+hold+" fail FOR"+receiveMessage.getStatusInfo());
 			Manager.manager.removeProcess(slaveId, hold);
+			break;
+		default:
 			break;
 		}
 	}

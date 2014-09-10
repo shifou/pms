@@ -5,14 +5,13 @@ import data.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Iterator;
-import java.util.Set;
+
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Vector;
+
 import java.util.concurrent.*;
 import java.net.Socket;
-import java.net.SocketException;
+
 public class Manager {
 	Server server;
 	private int port;
@@ -358,7 +357,7 @@ public class Manager {
             System.out.println("wrong arguments, usage: ./Manager <port number>");
             return;
         }
-        Manager manager;
+//        Manager manager;
         int port;
         try{
             port = Integer.valueOf(args[0]);
