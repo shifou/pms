@@ -45,7 +45,7 @@ public class Connection implements Runnable {
 				case FINISH:
 					handleSTART(receiveMessage);
 					break;
-				case MIGRATEBEGINFAIL:
+				//case MIGRATEBEGINFAIL:
 				case MIGRATEDONE:
 				case MIGRATEFAIL:
 					handleMIGRATE(receiveMessage);
@@ -54,6 +54,8 @@ public class Connection implements Runnable {
 				case KILLFAIL:
 					handleKILL(receiveMessage);
 					break;
+				case HEARTACK:
+					handleHEART(receiveMessage);
 				default:
 					System.out.println("unknow type");
 				}
@@ -65,31 +67,56 @@ public class Connection implements Runnable {
 
 	}
 
-	private void handleMIGRATE(Message receiveMessage) {
-		// TODO Auto-generated method stub
+	private void handleHEART(Message receiveMessage) {
+		Manager.manager.slaveStatus.put(receiveMessage.getHeartId(), 1);
 		
 	}
 
+	private void handleMIGRATE(Message receiveMessage) {
+		int hold = receiveMessage.getProcessInfo().getId();
+		switch (receiveMessage.getResponType()) {
+		//case MIGRATEBEGIN:
+		case MIGRATEDONE:
+			System.out.println("slave "+slaveId+" migrate process "+hold+" to slave "+receiveMessage.getDestID());
+			Manager.manager.transferProcess(receiveMessage.getSourceID(),receiveMessage.getDestID(),hold);
+		case MIGRATEFAIL:
+			System.out.println("slave "+slaveId+" migrate process "+hold+" to slave "+receiveMessage.getDestID()+" fail FOR"+receiveMessage.getStatusInfo());
+			//Manager.manager.getProcessOfSlave(slaveId)
+			break;
+		}
+	}
+
 	private void handleSTART(Message receiveMessage) {
-		
+		int hold = receiveMessage.getProcessInfo().getId();
 		switch (receiveMessage.getResponType()) {
 		case STARTFAIL:
-			System.out.println("slave "+slaveId+" start process "+receiveMessage.getProcessinfo().getId()+" fail "+receiveMessage.getData());
+			System.out.println("slave "+slaveId+" start process "+hold+" fail FOR"+receiveMessage.getStatusInfo());
 			break;
 		case STARTDONE:
+			Manager.manager.proID++;
 			Manager.manager.slaves.put(slaveId, socket);
-			int hold = receiveMessage.getProcessinfo().getId();
-			Manager.manager.addProcess(slaveId, hold);
+			Manager.manager.addProcess(slaveId, hold,receiveMessage.getProcessInfo());
 			System.out.println("slave "+slaveId+" start process "+hold+" success");
 			break;
 		case FINISH:
-			Manager.manager.removeProcess(slaveId, receiveMessage.getProcessinfo().getId());
+			System.out.println("slave "+slaveId+" finish process "+hold);
+			Manager.manager.removeProcess(slaveId, hold);
+			break;
 		}
 	}
 
 	private void handleKILL(Message receiveMessage) {
-		// TODO Auto-generated method stub
-		
+		int hold = receiveMessage.getProcessInfo().getId();
+		switch (receiveMessage.getResponType()) {
+		case KILLDONE:
+			System.out.println("slave "+slaveId+" killed process "+hold+" success");
+			Manager.manager.removeProcess(slaveId, hold);
+			break;
+		case KILLFAIL:
+			System.out.println("slave "+slaveId+" start process "+hold+" fail FOR"+receiveMessage.getStatusInfo());
+			Manager.manager.removeProcess(slaveId, hold);
+			break;
+		}
 	}
 
 	public int send(Message mes) throws IOException {

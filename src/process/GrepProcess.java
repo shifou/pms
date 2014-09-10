@@ -1,13 +1,11 @@
-package process;
-
 import java.io.PrintStream;
 import java.io.EOFException;
 import java.io.DataInputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.lang.Thread;
 import java.lang.InterruptedException;
-
-import transIO.*;
 
 public class GrepProcess implements MigratableProcess
 {
@@ -26,7 +24,7 @@ public class GrepProcess implements MigratableProcess
 		
 		query = args[0];
 		inFile = new TransactionalFileInputStream(args[1]);
-		outFile = new TransactionalFileOutputStream(args[2]);
+		outFile = new TransactionalFileOutputStream(args[2], false);
 	}
 
 	public void run()

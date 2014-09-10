@@ -16,6 +16,7 @@ import java.net.SocketException;
 public class Manager {
 	Server server;
 	private int port;
+	public int proID;
 	public Timer monitor;
     private BufferedReader console;
     public ConcurrentHashMap<Integer,Socket> slaves;
@@ -24,6 +25,7 @@ public class Manager {
 	public ConcurrentHashMap<Integer,ConcurrentHashMap<Integer, ProcessInfo>> processes;
     public Manager(int listenPort){
         port = listenPort;
+        proID=1;
         console = new BufferedReader(new InputStreamReader(System.in));
     }
     
@@ -123,7 +125,7 @@ public class Manager {
         
         
        
-            Message msg = new Message();
+            Message msg = new Message(proID,msgType.START);
 			send(slaveId, msg);
         }
         
@@ -160,7 +162,7 @@ public class Manager {
         ProcessInfo procInfo = proList.get(procId);
         if (procInfo.getStatus()==Status.RUNNING) {
                 
-                Message msg = new Message();
+                Message msg = new Message(slaveId,procId,msgType.KILL);
 				send(slaveId, msg);
                 
                 
@@ -212,19 +214,20 @@ public class Manager {
             System.out.println("no such process in the source slave");
             return;
         }
-       
+        ProcessInfo process= proList.get(procId);
      
         
-        Message msg = new Message();
-			send(sourceId, msg);
+        Message msg = new Message(sourceId, targetId, process);
+		send(targetId,msg);
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			msg=new Message();
-			send(targetId,msg);
+			
+			send(sourceId, msg);
+	
         
 
 
@@ -291,8 +294,7 @@ public class Manager {
         		continue;
         	}
         	status.put(one, 0);
-        	/* unfinished send heart msg*/
-        	Message msg=new Message();
+        	Message msg=new Message(one,msgType.HEART);
         	send(one,msg);
         }
     }
@@ -356,6 +358,7 @@ public class Manager {
             System.out.println("wrong arguments, usage: ./Manager <port number>");
             return;
         }
+        Manager manager;
         int port;
         try{
             port = Integer.valueOf(args[0]);
@@ -377,12 +380,23 @@ public class Manager {
 	public void addProcess(int slaveId, int id,ProcessInfo info) {
 		ConcurrentHashMap<Integer, ProcessInfo> hold= processes.get(slaveId);
 		hold.put(id, info);
-		
+		processes.put(slaveId, hold);
 		
 	}
 
 	public void removeProcess(int slaveId, int id) {
-		// TODO Auto-generated method stub
+		ConcurrentHashMap<Integer, ProcessInfo> hold= processes.get(slaveId);
+		hold.remove(slaveId);
+		processes.put(slaveId, hold);
+	}
+	public void transferProcess(int sourceID, int destID, int proId) {
 		
+		ConcurrentHashMap<Integer, ProcessInfo> src= processes.get(sourceID);
+		ProcessInfo hold= src.get(proId);
+		src.remove(proId);
+		processes.put(sourceID, src);
+		ConcurrentHashMap<Integer, ProcessInfo> des= processes.get(destID);
+		des.put(destID,hold);
+		processes.put(destID, des);
 	}
 }
