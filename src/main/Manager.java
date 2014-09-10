@@ -5,13 +5,14 @@ import data.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
+import java.util.Iterator;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-
+import java.util.Vector;
 import java.util.concurrent.*;
 import java.net.Socket;
-
+import java.net.SocketException;
 public class Manager {
 	Server server;
 	private int port;
@@ -26,6 +27,10 @@ public class Manager {
         port = listenPort;
         proID=1;
         console = new BufferedReader(new InputStreamReader(System.in));
+        slaves=new ConcurrentHashMap<Integer,Socket>();
+        slaveStatus = new ConcurrentHashMap<Integer,Integer>();
+        con =new ConcurrentHashMap<Integer,Connection>();
+        processes= new ConcurrentHashMap<Integer,ConcurrentHashMap<Integer, ProcessInfo>>();
     }
     
     public void startConsole(){
@@ -41,35 +46,45 @@ public class Manager {
             }            
             
             String[] hold = line.split(" ");
-            switch(hold[0]){
-                case "start":
+           if(hold[0].equals("start"))
+           {
                     handleStartProcess(hold);
-                    break;
-                case "migrate":
+           }
+           else if(hold[0].equals("migrate"))
+           {
                     handleMigrateProcess(hold);
-                    break;
-                case "kill":
+           } 
+           else if(hold[0].equals("kill"))
+           {
+            
                     handleKillProcess(hold);
-                    break;
-                case "ls":
+           }
+           else if(hold[0].equals("ls"))
+           {
                     handleLs(hold);
-                    break;
-                case "ps":
+           }
+           else if(hold[0].equals("ps"))
+           {
+            
                     handlePs(hold);
-                    break;
-                case "help":
+           }
+           else if(hold[0].equals("help"))
+           {
+             
                     handleHelp(hold);
-                    break;
-                case "shutdown":
+           }
+           else if(hold[0].equals("shutdown"))
+           {
+             
                     terminate();
                     System.out.println("terminating...");
                     System.exit(0);
-                    break;
-                default:
+           }
+           else
                     System.out.println(hold[0]+"is not a valid command");
             }
         }
-    }
+    
     
     private void handleLs(String[] line){
         if(0 == slaveSize())
@@ -77,7 +92,7 @@ public class Manager {
         else{
         	ConcurrentHashMap<Integer,Socket> slaveList = getSlaves();
             for(int i : slaveList.keySet())
-                System.out.println("Slave ID: "+i+"  IP Address: "+slaveList.get(i).getInetAddress());
+                System.out.println("Slave ID: "+i+"  IP Address: "+slaveList.get(i).getInetAddress()+" port: "+slaveList.get(i).getPort());
         }
     }
     
@@ -357,7 +372,7 @@ public class Manager {
             System.out.println("wrong arguments, usage: ./Manager <port number>");
             return;
         }
-//        Manager manager;
+        //Manager manager;
         int port;
         try{
             port = Integer.valueOf(args[0]);

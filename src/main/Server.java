@@ -19,7 +19,7 @@ public class Server implements Runnable{
         conId = 0;
         running = true;
         try {
-         serverSocket = new ServerSocket(portNum);
+         serverSocket = new ServerSocket((short)portNum);
      } catch (IOException e) {
          // TODO Auto-generated catch block
          e.printStackTrace();
