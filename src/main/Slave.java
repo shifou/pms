@@ -26,6 +26,7 @@ public class Slave {
 
 	public Slave(int serverPort, String serverIP, int myPort) {
 		try {
+			this.serverPort=serverPort;
 			this.serverIP = InetAddress.getByName(serverIP);
 			this.myPort = myPort;
 			this.running = true;
@@ -45,13 +46,22 @@ public class Slave {
 		Slave s = new Slave(Integer.parseInt(args[0]), args[1],
 				Integer.parseInt(args[2]));
 		try {
+			//System.out.println(s.serverIP+"\t"+s.serverPort);
 			Socket toServer = new Socket(s.serverIP, s.serverPort);
-			s.serverIn = new ObjectInputStream(toServer.getInputStream());
+			System.out.println("456");
 			s.serverOut = new ObjectOutputStream(toServer.getOutputStream());
-
+			s.serverOut.flush();
+			System.out.println("789");
+			s.serverIn = new ObjectInputStream(toServer.getInputStream());
+			
+			
+			System.out.println("123");
 		} catch (IOException e) {
+			System.exit(-1);
 		}
+		System.out.println("listen");
 		while (s.running) {
+			
 			Message recvMessage;
 			try {
 				recvMessage = (Message) s.serverIn.readObject();

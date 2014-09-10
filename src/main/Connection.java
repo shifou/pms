@@ -24,9 +24,10 @@ public class Connection implements Runnable {
 	public Connection(int conId, Socket slaveSocket) throws IOException {
 		slaveId = conId;
 		socket = slaveSocket;
-		objInput = new ObjectInputStream(slaveSocket.getInputStream());
 		objOutput = new ObjectOutputStream(slaveSocket.getOutputStream());
-
+		objOutput.flush();
+		objInput = new ObjectInputStream(slaveSocket.getInputStream());
+		
 	}
 
 	@Override
