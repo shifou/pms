@@ -1,6 +1,5 @@
 package data;
 
-
 import process.MigratableProcess;
 
 
@@ -9,9 +8,11 @@ public class ProcessInfo {
     private String proName;
     private Status status;
     public MigratableProcess processObject;
-    public ProcessInfo(String name, int id, Status now)
+    public String args[];
+    public ProcessInfo(String name, int id, String[]a, Status now)
     {
     	proName= name;
+    	args=a;
     	proId = id;
     	status= now;
     }
@@ -20,6 +21,13 @@ public class ProcessInfo {
     }
 	public String getName() {
 		return proName;
+	}
+	public void setArgs(String[] arg){
+    	args= arg;
+    }
+	public String[] getArgs() {
+		
+		return args;
 	}
 	public void setStatus(Status st){
     	status= st;

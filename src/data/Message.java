@@ -1,11 +1,18 @@
 package data;
 public class Message {
-	public int id;
-
+	public ProcessInfo proInfo;
 	public msgType type;
+	public String data;
 	public msgType getResponType() {
-		// TODO Auto-generated method stub
 		return type;
+	}
+	public String getData() {
+		// TODO Auto-generated method stub
+		return data;
+	}
+	public ProcessInfo getProcessinfo() {
+		
+		return proInfo;
 	}
 
 }
