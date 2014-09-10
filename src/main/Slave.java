@@ -116,11 +116,20 @@ public class Slave {
 	}
 
 	private void handleStartProcess(Message received) {
+		try
+		{
 		ProcessInfo pI = received.getProcessInfo();
 		MigratableProcess p = pI.getProcess();
 		new Thread(p).start();
 		this.processes.put(pI.getId(), pI);
-
+		Message rep=new Message(pI,msgType.STARTDONE);
+		sendToServer(rep);
+		}
+		catch(Exception e)
+		{
+			Message rep=new Message(e.getMessage(),msgType.STARTFAIL);
+			sendToServer(rep);
+		}
 	}
 
 	private void handleMigration(Message received) {
@@ -168,14 +177,23 @@ public class Slave {
 		Message m = new Message(msgType.CONNECT);
 		try {
 			m.setDestIP(InetAddress.getLocalHost());
-			this.serverOut.writeObject(m);
-			this.serverOut.flush();
+			sendToServer(m);
 		} catch (IOException e){
 			
 		} 
 		
 	}
-
+	private void sendToServer(Message s)
+	{
+		try
+		{
+		this.serverOut.writeObject(s);
+		this.serverOut.flush();
+		}catch(Exception e)
+		{
+			System.out.println("slave send fail");
+		}
+	}
 	public void setSlaveID(int ID) {
 		this.slaveID = ID;
 	}

@@ -1,6 +1,7 @@
 package main;
 import main.Server;
 import data.*;
+import process.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -136,8 +137,18 @@ public class Manager {
         for(int i=3;i<line.length;i++){
             args[i-3] = line[i];
         }
-        
-        ProcessInfo hold=new ProcessInfo(line[1],slaveId,args,Status.RUNNING);
+        String processName = line[1];
+        MigratableProcess p=null;
+        if(processName.equals("GrepProcess"))
+        {
+        	try {
+				p=new GrepProcess(args);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				System.out.println("process class not found");
+			}
+        }
+        ProcessInfo hold=new ProcessInfo(p,line[1],slaveId,args,Status.RUNNING);
        
             Message msg = new Message(hold,msgType.START);
 			send(slaveId, msg);
@@ -178,7 +189,7 @@ public class Manager {
                 
                 
                
-            } else {
+            } else{
                 System.out.println("That process is not currently running");
             }
     } 

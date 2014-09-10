@@ -15,8 +15,9 @@ public class ProcessInfo implements Serializable {
     private Status status;
     private MigratableProcess process;
     private String args[];
-    public ProcessInfo(String name, int id, String[]a, Status now)
+    public ProcessInfo(MigratableProcess p,String name, int id, String[]a, Status now)
     {
+    	process=p;
     	proName= name;
     	args=a;
     	proId = id;

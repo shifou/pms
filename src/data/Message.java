@@ -48,6 +48,10 @@ public class Message implements Serializable {
 		type=start;
 		proInfo=hold;
 	}
+	public Message(String message, msgType startfail) {
+		statusInfo=message;
+		type=startfail;
+	}
 	public msgType getResponType() {
 		return this.type;
 	}
@@ -59,7 +63,10 @@ public class Message implements Serializable {
 	public void setDestPort(int destPort) {
 		this.destPort = destPort;
 	}
-
+	public int getProId()
+	{
+		return proId;
+	}
 	public InetAddress getDestHost() {
 		return this.destIP;
 	}
