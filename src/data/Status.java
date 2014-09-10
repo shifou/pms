@@ -5,7 +5,7 @@ public enum Status{
     RUNNING,
     SUSPEND,
     TERMINATING,
-    TRANSFERING,
+    MIGRATING,
     FAILED,
     DONE,
     EXIT

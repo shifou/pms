@@ -37,11 +37,9 @@ public class Message implements Serializable {
 		type=tp;
 	}
 	// migrate notification
-	public Message(int sourceId2, int targetId, ProcessInfo process,
-			InetAddress ip) {
+	public Message(int sourceId2, int targetId, InetAddress ip) {
 		sourceID= sourceId2;
 		destID= targetId;
-		proInfo=process;
 		destIP=ip;
 		type=msgType.MIGRATENOTI;
 	}

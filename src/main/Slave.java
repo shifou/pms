@@ -126,7 +126,7 @@ public class Slave {
 					pI.getProcess().getOutputStream().changeMigrated(true);
 				}
 				Message toSend = new Message(msgType.MIGRATEBEGIN);
-				pI.setStatus(Status.TRANSFERING);
+				pI.setStatus(Status.MIGRATING);
 				toSend.setProcessInfo(pI);
 				SlaveToSlave handler = new SlaveToSlave(toSlave, toSend);
 				new Thread(handler).start();
