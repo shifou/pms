@@ -18,6 +18,7 @@ public class SlaveToSlave implements Runnable {
 		this.toSlave = toSlave;
 		try {
 			this.out = new ObjectOutputStream(this.toSlave.getOutputStream());
+			this.out.flush();
 		} catch (IOException e){
 			
 		}
