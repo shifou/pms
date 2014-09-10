@@ -1,9 +1,9 @@
 package main;
 
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,12 +11,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import process.MigratableProcess;
 import data.*;
 
-
-
-public class Slave implements Runnable {
+public class Slave {
 
 	private ServerSocket clientListener;
-	private String serverHost;
+	private InetAddress serverIP;
 	private int myPort;
 	private int serverPort;
 	private boolean running;
@@ -25,10 +23,9 @@ public class Slave implements Runnable {
 	private ObjectOutputStream serverOut;
 	private ConcurrentHashMap<Integer, ProcessInfo> processes;
 
-	public Slave(int serverPort, String serverHost, int myPort)
-			throws IOException {
+	public Slave(int serverPort, String serverIP, int myPort) {
 		try {
-			this.serverHost = serverHost;
+			this.serverIP = InetAddress.getByName(serverIP);
 			this.myPort = myPort;
 			this.running = true;
 			this.clientListener = new ServerSocket(this.myPort);
@@ -43,43 +40,43 @@ public class Slave implements Runnable {
 		}
 	}
 
-	@Override
-	public void run() {
+	public static void main(String args[]) {
+		Slave s = new Slave(Integer.parseInt(args[0]), args[1],
+				Integer.parseInt(args[2]));
 		try {
-			Socket toServer = new Socket(this.serverHost, this.serverPort);
-			this.serverIn = new ObjectInputStream(toServer.getInputStream());
-			this.serverOut = new ObjectOutputStream(toServer.getOutputStream());
+			Socket toServer = new Socket(s.serverIP, s.serverPort);
+			s.serverIn = new ObjectInputStream(toServer.getInputStream());
+			s.serverOut = new ObjectOutputStream(toServer.getOutputStream());
 
 		} catch (IOException e) {
 		}
-		while (this.running){
+		while (s.running) {
 			Message recvMessage;
 			try {
-				recvMessage = (Message) serverIn.readObject();
+				recvMessage = (Message) s.serverIn.readObject();
 				System.out.println("worker message received: id "
 						+ recvMessage.getResponType());
 				switch (recvMessage.getResponType()) {
 				case START:
-					handleStartProcess(recvMessage);
+					s.handleStartProcess(recvMessage);
 					break;
 				case MIGRATEBEGIN:
-					handleMigration(recvMessage);
+					s.handleMigration(recvMessage);
 					break;
 				case KILL:
-					handleKillProcess(recvMessage);
+					s.handleKillProcess(recvMessage);
 					break;
 				default:
 					System.out
 							.println("Unrecognized message received from server at Slave: "
-									+ Integer.valueOf(this.slaveID)
-											.toString());
+									+ Integer.valueOf(s.slaveID).toString());
 				}
-			} catch (IOException e){
-				
-			}catch (ClassNotFoundException e){
+			} catch (IOException e) {
+
+			} catch (ClassNotFoundException e) {
 				continue;
 			}
-			
+
 		}
 	}
 
@@ -94,30 +91,30 @@ public class Slave implements Runnable {
 		ProcessInfo pI = received.getProcessInfo();
 		MigratableProcess p = pI.getProcess();
 		new Thread(p).start();
-		this.processes.put(pI.getId(),pI);
-		
+		this.processes.put(pI.getId(), pI);
+
 	}
 
-	private void handleMigration(Message received){
-		if (received.getSourceID() == this.slaveID){
+	private void handleMigration(Message received) {
+		if (received.getSourceID() == this.slaveID) {
 			try {
-				Socket toSlave = new Socket(received.getDestHost(), received.getDestPort());
-				SlaveToSlave slaveConnection = new SlaveToSlave();
-				
-			} catch (IOException e){
-				
+				Socket toSlave = new Socket(received.getDestHost(),
+						received.getDestPort());
+				Message toSend = new Message(msgType.MIGRATEBEGIN);
+
+			} catch (IOException e) {
+
 			}
-		}
-		else if (received.getDestID() == this.slaveID){
+		} else if (received.getDestID() == this.slaveID) {
 			try {
 				Socket toSlave = this.clientListener.accept();
-				
-			} catch (IOException e){
-				
+
+			} catch (IOException e) {
+
 			}
 		}
 	}
-	
+
 	public void setSlaveID(int ID) {
 		this.slaveID = ID;
 	}
