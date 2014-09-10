@@ -9,6 +9,8 @@ public class Message implements Serializable {
 	private static final long serialVersionUID = -2553768344528279980L;
 	
 	private ProcessInfo proInfo;
+	private int tempId;
+	private int proId;
 	private msgType type;
 	private String statusInfo;
 	private int sourceID;
@@ -19,11 +21,28 @@ public class Message implements Serializable {
 	public Message(msgType type){
 		this.type = type;
 	}
+	// kill message
+	public Message (int conId,int killproId, msgType tp)
+	{
+		proId=killproId;
+		tempId=conId;
+		type=tp;
+	}
+	// assign conId Message
+	public Message (int conId,msgType tp)
+	{
+		tempId=conId;
+		type=tp;
+	}
+	// migrate Noti
+	public Message(int sourceId, int targetId, ProcessInfo process) {
+		proInfo=process;
+		sourceID=sourceId;
+		destID=targetId;
+		type=msgType.MIGRATENOTI;
+				
+	}
 
-	
-	
-
-	
 	public msgType getResponType() {
 		return this.type;
 	}
@@ -86,6 +105,13 @@ public class Message implements Serializable {
 
 	public void setProcessInfo(ProcessInfo proInfo) {
 		this.proInfo = proInfo;
+	}
+
+
+
+	public Integer getHeartId() {
+		
+		return tempId;
 	}
 
 }

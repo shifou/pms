@@ -2,6 +2,7 @@ package data;
 
 public enum msgType {
 	START,
+	CONNECT,
 	STARTFAIL,
 	STARTDONE,
 	FINISH,

@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import data.Message;
 import data.ProcessInfo;
+import data.msgType;
 public class Server implements Runnable{
 	private int conId;
 	private int port;
@@ -46,10 +47,11 @@ public class Server implements Runnable{
              Connection slaveService;
 			try {
 				slaveService = new Connection(conId, slaveSocket);
-				
-	             new Thread(slaveService).start();
-	            
-	             Manager.manager.con.put(conId, slaveService);
+	            new Thread(slaveService).start();
+	            Manager.manager.con.put(conId, slaveService);
+	            Message msg= new Message(conId,msgType.CONNECT);
+	            Manager.manager.send(conId, msg);
+	             
 	             
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
