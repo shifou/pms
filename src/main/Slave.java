@@ -88,7 +88,7 @@ public class Slave implements Runnable {
 		MigratableProcess p = pI.getProcess();
 		p.kill();
 		this.processes.remove(pI.getId());
-		
+	}
 
 	private void handleStartProcess(Message received) {
 		ProcessInfo pI = received.getProcessInfo();
@@ -102,14 +102,19 @@ public class Slave implements Runnable {
 		if (received.getSourceID() == this.slaveID){
 			try {
 				Socket toSlave = new Socket(received.getDestHost(), received.getDestPort());
-				
+				SlaveToSlave slaveConnection = new SlaveToSlave();
 				
 			} catch (IOException e){
 				
 			}
 		}
 		else if (received.getDestID() == this.slaveID){
-			
+			try {
+				Socket toSlave = this.clientListener.accept();
+				
+			} catch (IOException e){
+				
+			}
 		}
 	}
 	

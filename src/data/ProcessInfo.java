@@ -1,14 +1,20 @@
 package data;
 
+import java.io.Serializable;
+
 import process.MigratableProcess;
 
 
-public class ProcessInfo {
-    private int proId;
+public class ProcessInfo implements Serializable {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4034010548176885851L;
+	private int proId;
     private String proName;
     private Status status;
-    public MigratableProcess processObject;
-    public String args[];
+    private MigratableProcess process;
+    private String args[];
     public ProcessInfo(String name, int id, String[]a, Status now)
     {
     	proName= name;
@@ -40,6 +46,12 @@ public class ProcessInfo {
     }
 	public int getId() {
 		return proId;
+	}
+	public MigratableProcess getProcess() {
+		return this.process;
+	}
+	public void setProcess(MigratableProcess process) {
+		this.process = process;
 	}
 	
 }
