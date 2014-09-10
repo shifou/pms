@@ -104,7 +104,7 @@ public class Manager {
         }
         int slaveId;
         try{
-            slaveId = Integer.valueOf(line[1]);
+            slaveId = Integer.valueOf(line[2]);
             
         }catch(Exception e){
             System.out.println("the slave id is not a number");
@@ -123,9 +123,9 @@ public class Manager {
             args[i-3] = line[i];
         }
         
-        
+        ProcessInfo hold=new ProcessInfo(line[1],slaveId,args,Status.RUNNING);
        
-            Message msg = new Message(proID,msgType.START);
+            Message msg = new Message(hold,msgType.START);
 			send(slaveId, msg);
         }
         
@@ -144,14 +144,11 @@ public class Manager {
             
         }catch(Exception e){
             System.out.println("the slave id is not a number");
-            return;
-            
+            return;   
         }
-
         if(slaves.containsKey(slaveId)==false){
             System.out.println("there is no slave with id number "+slaveId);
             return;
-        
         }
         ConcurrentHashMap<Integer,ProcessInfo> proList = getProcessOfSlave(slaveId);
         
@@ -166,8 +163,7 @@ public class Manager {
 				send(slaveId, msg);
                 
                 
-                /*update the process status when receive the reply from worker*/
-
+               
             } else {
                 System.out.println("That process is not currently running");
             }
@@ -215,9 +211,13 @@ public class Manager {
             return;
         }
         ProcessInfo process= proList.get(procId);
-     
-        
-        Message msg = new Message(sourceId, targetId, process);
+        if(process.getStatus()!=Status.RUNNING)
+        {
+        	System.out.println("this process is not in the state of running");
+            return;
+        }
+        process.setStatus(Status.MIGRATING);
+        Message msg = new Message(sourceId, targetId, con.get(targetId).getIp());
 		send(targetId,msg);
 			try {
 				Thread.sleep(1000);
@@ -238,7 +238,7 @@ public class Manager {
         System.out.println("Commands List:");
         System.out.println("ls : list all the slave node in the system");
         System.out.println("ps : list all the processes that slave have");
-        System.out.println("start <process name> <args[]> <slaveId> : start the process on one slave");
+        System.out.println("start <process name> <slaveId> <args[]>  : start the process on one slave");
         System.out.println("migrate <processId> <source slaveId> <target slaveId> : migrate process from one slave to another slave");
         System.out.println("kill <processId> <slaveId>: kill the process in slave");
     }
@@ -294,7 +294,7 @@ public class Manager {
         		continue;
         	}
         	status.put(one, 0);
-        	Message msg=new Message(one,msgType.HEART);
+        	Message msg=new Message(msgType.HEART);
         	send(one,msg);
         }
     }
