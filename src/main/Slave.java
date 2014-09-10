@@ -58,6 +58,9 @@ public class Slave {
 				System.out.println("worker message received: id "
 						+ recvMessage.getResponType());
 				switch (recvMessage.getResponType()) {
+				case CONNECT:
+					s.handleFirstConnection(recvMessage);
+					break;
 				case START:
 					s.handleStartProcess(recvMessage);
 					break;
@@ -67,6 +70,8 @@ public class Slave {
 				case KILL:
 					s.handleKillProcess(recvMessage);
 					break;
+				case HEART:
+					s.handlePollingReq(recvMessage);
 				default:
 					System.out
 							.println("Unrecognized message received from server at Slave: "
@@ -79,6 +84,16 @@ public class Slave {
 			}
 
 		}
+	}
+
+	private void handlePollingReq(Message recvMessage) {
+		Message m = new Message(msgType.HEARTACK);
+		try {
+			this.serverOut.writeObject(m);
+		} catch (IOException e){
+			
+		} 
+		
 	}
 
 	private void handleKillProcess(Message received) {
@@ -101,7 +116,20 @@ public class Slave {
 			try {
 				Socket toSlave = new Socket(received.getDestHost(),
 						received.getDestPort());
+				int pID = received.getProcessInfo().getId();
+				ProcessInfo pI = this.processes.get(new Integer(pID));
+				pI.getProcess().suspend();
+				if (pI.getProcess().getInputStream() != null){
+					pI.getProcess().getInputStream().changeMigrated(true);
+				}
+				if (pI.getProcess().getOutputStream() != null){
+					pI.getProcess().getOutputStream().changeMigrated(true);
+				}
 				Message toSend = new Message(msgType.MIGRATEBEGIN);
+				pI.setStatus(Status.TRANSFERING);
+				toSend.setProcessInfo(pI);
+				SlaveToSlave handler = new SlaveToSlave(toSlave, toSend);
+				new Thread(handler).start();
 
 			} catch (IOException e) {
 
@@ -109,11 +137,30 @@ public class Slave {
 		} else if (received.getDestID() == this.slaveID) {
 			try {
 				Socket toSlave = this.clientListener.accept();
+				ObjectInputStream in = new ObjectInputStream(toSlave.getInputStream());
+				Message rcvd = (Message) in.readObject();
+				ProcessInfo pI = rcvd.getProcessInfo();
+				new Thread(pI.getProcess()).start();
+				this.processes.put(pI.getId(), pI);
 
 			} catch (IOException e) {
 
+			}catch (ClassNotFoundException e){
+				
 			}
 		}
+	}
+	
+	private void handleFirstConnection(Message received){
+		this.slaveID = received.getSlaveID();
+		Message m = new Message(msgType.CONNECT);
+		try {
+			m.setDestIP(InetAddress.getLocalHost());
+			this.serverOut.writeObject(m);
+		} catch (IOException e){
+			
+		} 
+		
 	}
 
 	public void setSlaveID(int ID) {

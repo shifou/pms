@@ -17,7 +17,7 @@ public class Message implements Serializable {
 	private int destID;
 	private InetAddress destIP;
 	private int destPort;
-	private int tempID;
+	private int slaveID;
 	
 	public Message(msgType type){
 		this.type = type;
@@ -31,7 +31,7 @@ public class Message implements Serializable {
 	// assign slaveID Message
 	public Message (msgType tp, int slaveID)
 	{
-		tempID = slaveID;
+		this.slaveID = slaveID;
 		type=tp;
 	}
 	// migrate notification
@@ -106,12 +106,10 @@ public class Message implements Serializable {
 	public void setProcessInfo(ProcessInfo proInfo) {
 		this.proInfo = proInfo;
 	}
-
-
-
-	public Integer getHeartId() {
-		
-		return tempID;
+	
+	public int getSlaveID(){
+		return this.slaveID;
 	}
+
 
 }
