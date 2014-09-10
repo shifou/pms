@@ -42,6 +42,11 @@ public class Message implements Serializable {
 		destIP=ip;
 		type=msgType.MIGRATENOTI;
 	}
+	//start a process
+	public Message(ProcessInfo hold, msgType start) {
+		type=start;
+		proInfo=hold;
+	}
 	public msgType getResponType() {
 		return this.type;
 	}

@@ -22,7 +22,8 @@ public class ProcessInfo implements Serializable {
     	proId = id;
     	status= now;
     }
-    public void setName(String name){
+
+	public void setName(String name){
     	proName= name;
     }
 	public String getName() {
