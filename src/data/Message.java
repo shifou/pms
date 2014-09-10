@@ -17,7 +17,6 @@ public class Message implements Serializable {
 	private int destID;
 	private InetAddress destIP;
 	private int destPort;
-	private int tempID;
 	
 	public Message(msgType type){
 		this.type = type;
@@ -31,18 +30,18 @@ public class Message implements Serializable {
 	// assign slaveID Message
 	public Message (msgType tp, int slaveID)
 	{
-		tempID = slaveID;
+		proId = slaveID;
 		type=tp;
 	}
 	// migrate notification
-	public Message(int sourceId, int targetId, ProcessInfo process) {
+	public Message(int sourceId2, int targetId, ProcessInfo process,
+			InetAddress ip) {
+		sourceID= sourceId2;
+		destID= targetId;
 		proInfo=process;
-		sourceID=sourceId;
-		destID=targetId;
+		destIP=ip;
 		type=msgType.MIGRATENOTI;
-				
 	}
-
 	public msgType getResponType() {
 		return this.type;
 	}
@@ -80,38 +79,24 @@ public class Message implements Serializable {
 	}
 
 
-
 	public String getStatusInfo() {
 		return this.statusInfo;
 	}
 
 
-
 	public void setStatusInfo(String statusInfo) {
 		this.statusInfo = statusInfo;
 	}
-
-
-
-
-
+	
 	public ProcessInfo getProcessInfo() {
 		return this.proInfo;
 	}
 
-
-
-
-
 	public void setProcessInfo(ProcessInfo proInfo) {
 		this.proInfo = proInfo;
 	}
-
-
-
-	public Integer getHeartId() {
+	public InetAddress getIp() {
 		
-		return tempID;
+		return destIP;
 	}
-
 }

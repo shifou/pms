@@ -144,14 +144,11 @@ public class Manager {
             
         }catch(Exception e){
             System.out.println("the slave id is not a number");
-            return;
-            
+            return;   
         }
-
         if(slaves.containsKey(slaveId)==false){
             System.out.println("there is no slave with id number "+slaveId);
             return;
-        
         }
         ConcurrentHashMap<Integer,ProcessInfo> proList = getProcessOfSlave(slaveId);
         
@@ -217,7 +214,7 @@ public class Manager {
         ProcessInfo process= proList.get(procId);
      
         
-        Message msg = new Message(sourceId, targetId, process);
+        Message msg = new Message(sourceId, targetId, process,con.get(targetId).getIp());
 		send(targetId,msg);
 			try {
 				Thread.sleep(1000);
@@ -294,7 +291,7 @@ public class Manager {
         		continue;
         	}
         	status.put(one, 0);
-        	Message msg=new Message(one,msgType.HEART);
+        	Message msg=new Message(msgType.HEART);
         	send(one,msg);
         }
     }

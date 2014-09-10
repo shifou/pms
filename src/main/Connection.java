@@ -1,18 +1,19 @@
 package main;
 
 import data.Message;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
-
 import java.net.Socket;
 import java.util.Vector;
 
 import data.ProcessInfo;
 
 public class Connection implements Runnable {
-
+	private InetAddress ipaddr;
 	private int slaveId;
 	private Socket socket;
 	private volatile boolean running;
@@ -40,6 +41,9 @@ public class Connection implements Runnable {
 				}
 				System.out.println("slave receive message: "+ receiveMessage.getResponType());
 				switch (receiveMessage.getResponType()) {
+				case CONNECT:
+					ipaddr=receiveMessage.getIp();
+					break;
 				case STARTFAIL:
 				case STARTDONE:
 				case FINISH:
@@ -68,7 +72,7 @@ public class Connection implements Runnable {
 	}
 
 	private void handleHEART(Message receiveMessage) {
-		Manager.manager.slaveStatus.put(receiveMessage.getHeartId(), 1);
+		Manager.manager.slaveStatus.put(slaveId, 1);
 		
 	}
 
@@ -133,5 +137,10 @@ public class Connection implements Runnable {
 
 	public void stop() {
 		running = false;
+	}
+
+	public InetAddress getIp() {
+		// TODO Auto-generated method stub
+		return ipaddr;
 	}
 }
