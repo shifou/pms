@@ -1,3 +1,5 @@
+
+package process;
 import java.io.PrintStream;
 import java.io.EOFException;
 import java.io.DataInputStream;
@@ -7,6 +9,9 @@ import java.io.IOException;
 import java.lang.Thread;
 import java.lang.InterruptedException;
 
+import transIO.TransactionalFileInputStream;
+import transIO.TransactionalFileOutputStream;
+
 public class GrepProcess implements MigratableProcess
 {
 	private TransactionalFileInputStream  inFile;
@@ -14,6 +19,7 @@ public class GrepProcess implements MigratableProcess
 	private String query;
 
 	private volatile boolean suspending;
+	private volatile boolean killed;
 
 	public GrepProcess(String args[]) throws Exception
 	{
@@ -24,7 +30,7 @@ public class GrepProcess implements MigratableProcess
 		
 		query = args[0];
 		inFile = new TransactionalFileInputStream(args[1]);
-		outFile = new TransactionalFileOutputStream(args[2], false);
+		outFile = new TransactionalFileOutputStream(args[2]);
 	}
 
 	public void run()
@@ -33,7 +39,7 @@ public class GrepProcess implements MigratableProcess
 		DataInputStream in = new DataInputStream(inFile);
 
 		try {
-			while (!suspending) {
+			while ((!suspending) && (!killed)) {
 				String line = in.readLine();
 
 				if (line == null) break;
@@ -63,6 +69,24 @@ public class GrepProcess implements MigratableProcess
 	{
 		suspending = true;
 		while (suspending);
+	}
+
+	@Override
+	public TransactionalFileInputStream getInputStream() {
+		// TODO Auto-generated method stub
+		return this.inFile;
+	}
+
+	@Override
+	public TransactionalFileOutputStream getOutputStream() {
+		// TODO Auto-generated method stub
+		return this.outFile;
+	}
+
+	@Override
+	public void kill() {
+		this.killed = true;
+		
 	}
 
 }
