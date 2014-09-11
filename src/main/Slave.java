@@ -36,7 +36,7 @@ public class Slave {
 			this.clientListener = new ServerSocket(this.myPort);
 			this.processes = new ConcurrentHashMap<Integer, ProcessInfo>();
 			this.processThreads = new ConcurrentHashMap<Integer, Thread>();
-			this.startTimer();
+		
 
 		} catch (IOException e) {
 
@@ -82,6 +82,7 @@ public class Slave {
 		} catch (IOException e) {
 			System.exit(-1);
 		}
+		s.startTimer();
 		System.out.println("listen");
 		while (s.running) {
 
