@@ -1,12 +1,12 @@
+/*
+ * Message class is a class used for communication through network 
+ * including the ProcessInfo and other information, each time we will send one message
+ */
 package data;
-
 import java.io.Serializable;
 import java.net.InetAddress;
-
 public class Message implements Serializable {
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = -2553768344528279980L;
 	
 	private ProcessInfo proInfo;
@@ -19,7 +19,7 @@ public class Message implements Serializable {
 	private int destPort;
 	private int slaveID;
 
-	
+	// heart beat message
 	public Message(msgType type){
 		this.type = type;
 	}
@@ -36,7 +36,7 @@ public class Message implements Serializable {
 
 		type=tp;
 	}
-	// migrate notification
+	// migrate notification message
 	public Message(int sourceId2, int targetId, int id,InetAddress ip,int port) {
 		proId=id;
 		sourceID= sourceId2;
@@ -45,22 +45,22 @@ public class Message implements Serializable {
 		type=msgType.MIGRATENOTI;
 		destPort=port;
 	}
-	//start a process
+	//start process message
 	public Message(ProcessInfo hold, int proId,msgType start) {
 		type=start;
 		proInfo=hold;
 		this.proId=proId;
 	}
-	// migrate fail reason
+	// migrate fail message
 	public Message(String message, msgType startfail) {
 		statusInfo=message;
 		type=startfail;
 	}
-	// migrate fail result
-	public Message(String message, int id,msgType startfail) {
+	// start done message
+	public Message(String message, int id,msgType start) {
 		proId=id;
 		statusInfo=message;
-		type=startfail;
+		type=start;
 	}
 	//migrate done
 	public Message(msgType migratedone, int id, int sourceID2, int destID2) {

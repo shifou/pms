@@ -1,3 +1,7 @@
+/*
+ * connection class is the listening thread getting messgae from one specific slave
+ * and according to the messagetype we go different handlers
+ */
 package main;
 
 import data.Message;
@@ -50,12 +54,12 @@ public class Connection implements Runnable {
 				}
 				catch(EOFException e)
 				{
-					System.out.println("detect disconnected message");
+					//System.out.println("detect disconnected message");
 					continue;
 				}
 				catch(Exception e)
 				{
-					System.out.println("-----");
+					//System.out.println("-----");
 					continue;
 				}
 				if(receiveMessage.getResponType()!=msgType.HEARTACK)
@@ -98,13 +102,14 @@ public class Connection implements Runnable {
 		}
 
 	}
-
+	//handle haertbeat message
 	private void handleHEART(Message receiveMessage) {
 		int st=Manager.manager.slaveStatus.get(slaveId);
 		Manager.manager.slaveStatus.put(slaveId, st+1);
 		
 	}
 
+	//handle migrate message
 	private void handleMIGRATE(Message receiveMessage) {
 		int hold = receiveMessage.getProId();
 		switch (receiveMessage.getResponType()) {
@@ -122,6 +127,7 @@ public class Connection implements Runnable {
 		}
 	}
 
+	//handle process start message
 	private void handleSTART(Message receiveMessage) {
 		int hold = receiveMessage.getProId();
 		switch (receiveMessage.getResponType()) {
@@ -142,7 +148,7 @@ public class Connection implements Runnable {
 			break;
 		}
 	}
-
+	//handle kill message
 	private void handleKILL(Message receiveMessage) {
 		int hold = receiveMessage.getProId();
 		switch (receiveMessage.getResponType()) {
@@ -158,7 +164,7 @@ public class Connection implements Runnable {
 			break;
 		}
 	}
-
+	//send message throught the socket
 	public int send(Message mes) throws IOException {
 		synchronized(this.socket)
 		{

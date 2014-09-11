@@ -1,4 +1,6 @@
-
+/*
+ * display the first N line strings
+ */
 package process;
 import java.io.PrintStream;
 import java.io.EOFException;

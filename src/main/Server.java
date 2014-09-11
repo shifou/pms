@@ -1,3 +1,7 @@
+/*
+ * Server class used for listening from slaves join information 
+ * and create the connection thread
+ */
 package main;
 import java.io.IOException;
 import java.net.Socket;

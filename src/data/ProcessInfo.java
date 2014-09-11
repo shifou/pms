@@ -1,3 +1,6 @@
+/*
+ * define the class that we use to save the process information for migration 
+ */
 package data;
 
 import java.io.Serializable;

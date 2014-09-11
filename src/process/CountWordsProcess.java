@@ -1,4 +1,6 @@
-
+/*
+ * count the total words number in files
+ */
 package process;
 import java.io.PrintStream;
 import java.io.EOFException;

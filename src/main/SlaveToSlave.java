@@ -1,3 +1,6 @@
+/*
+ * small thread used for slave-slave communication
+ */
 package main;
 
 import java.io.IOException;

@@ -1,3 +1,6 @@
+/*
+ * process status
+ */
 package data;
 
 public enum Status{

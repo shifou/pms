@@ -1,3 +1,6 @@
+/*
+ * slave class for handling all the message commands from server and reply accordingly.
+ */
 package main;
 
 import java.io.IOException;
