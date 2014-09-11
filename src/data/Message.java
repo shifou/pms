@@ -44,9 +44,10 @@ public class Message implements Serializable {
 		type=msgType.MIGRATENOTI;
 	}
 	//start a process
-	public Message(ProcessInfo hold, msgType start) {
+	public Message(ProcessInfo hold, int proId,msgType start) {
 		type=start;
 		proInfo=hold;
+		this.proId=proId;
 	}
 	public Message(String message, msgType startfail) {
 		statusInfo=message;

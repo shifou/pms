@@ -2,6 +2,7 @@ package main;
 
 import data.Message;
 import data.ProcessInfo;
+import data.msgType;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -43,6 +44,7 @@ public class Connection implements Runnable {
 					System.out.println("read message error");
 					continue;
 				}
+				if(receiveMessage.getResponType()!=msgType.HEARTACK)
 				System.out.println("slave receive message: "+ receiveMessage.getResponType());
 				switch (receiveMessage.getResponType()) {
 				case CONNECT:
@@ -103,7 +105,7 @@ public class Connection implements Runnable {
 	}
 
 	private void handleSTART(Message receiveMessage) {
-		int hold = receiveMessage.getProcessInfo().getId();
+		int hold = receiveMessage.getProId();
 		switch (receiveMessage.getResponType()) {
 		case STARTFAIL:
 			System.out.println("slave "+slaveId+" start process "+hold+" fail FOR"+receiveMessage.getStatusInfo());
@@ -124,7 +126,7 @@ public class Connection implements Runnable {
 	}
 
 	private void handleKILL(Message receiveMessage) {
-		int hold = receiveMessage.getProcessInfo().getId();
+		int hold = receiveMessage.getProId();
 		switch (receiveMessage.getResponType()) {
 		case KILLDONE:
 			System.out.println("slave "+slaveId+" killed process "+hold+" success");
@@ -142,6 +144,7 @@ public class Connection implements Runnable {
 	public int send(Message mes) throws IOException {
 		try
 		{
+			if(mes.getResponType()!=msgType.HEART)
 			System.out.println("send to "+slaveId+"\t"+mes.getResponType());
 			objOutput.writeObject(mes);
 			objOutput.flush();

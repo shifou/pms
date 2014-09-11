@@ -65,6 +65,7 @@ public class Slave {
 			Message recvMessage;
 			try {
 				recvMessage = (Message) s.serverIn.readObject();
+				if(recvMessage.getResponType()!=msgType.HEART)
 				System.out.println("worker message received: id "
 						+ recvMessage.getResponType());
 				switch (recvMessage.getResponType()) {
@@ -101,9 +102,9 @@ public class Slave {
 	private void handlePollingReq(Message recvMessage) {
 		Message m = new Message(msgType.HEARTACK);
 		try {
-			this.serverOut.writeObject(m);
-		} catch (IOException e){
-			
+				sendToServer(m);
+		} catch (Exception e){
+			System.out.println("send heart error");
 		} 
 		
 	}
@@ -119,11 +120,13 @@ public class Slave {
 		try
 		{
 		ProcessInfo pI = received.getProcessInfo();
+		Message rep=new Message(pI,received.getProId(),msgType.STARTDONE);
+		sendToServer(rep);
 		MigratableProcess p = pI.getProcess();
 		new Thread(p).start();
 		this.processes.put(pI.getId(), pI);
-		Message rep=new Message(pI,msgType.STARTDONE);
-		sendToServer(rep);
+		//Message rep=new Message(pI,msgType.STARTDONE);
+		
 		}
 		catch(Exception e)
 		{
@@ -185,12 +188,15 @@ public class Slave {
 	}
 	private void sendToServer(Message s)
 	{
+		if(s.getResponType()!=msgType.HEARTACK)
+		System.out.println("send message: "+s.getResponType()+"\t");
 		try
 		{
 		this.serverOut.writeObject(s);
 		this.serverOut.flush();
 		}catch(Exception e)
 		{
+			e.printStackTrace();
 			System.out.println("slave send fail");
 		}
 	}

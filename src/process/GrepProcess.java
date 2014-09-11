@@ -43,7 +43,7 @@ public class GrepProcess implements MigratableProcess
 		try {
 			while ((!suspending) && (!killed)) {
 				String line = in.readLine();
-
+				System.out.println(line);
 				if (line == null) break;
 				
 				if (line.contains(query)) {
@@ -58,7 +58,7 @@ public class GrepProcess implements MigratableProcess
 				}
 			}
 		} catch (EOFException e) {
-			//End of File
+			System.out.println("end of file");
 		} catch (IOException e) {
 			System.out.println ("GrepProcess: Error: " + e);
 		}

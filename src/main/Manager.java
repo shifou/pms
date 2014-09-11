@@ -150,7 +150,7 @@ public class Manager {
         }
         ProcessInfo hold=new ProcessInfo(p,line[1],slaveId,args,Status.RUNNING);
        
-            Message msg = new Message(hold,msgType.START);
+            Message msg = new Message(hold,Manager.manager.proID,msgType.START);
 			send(slaveId, msg);
         }
         
