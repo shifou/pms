@@ -344,13 +344,14 @@ public class Manager {
     	//System.out.println("check: "+status.size());
         for(Integer one : status.keySet())
         {
+        	int hh=status.get(one);
         	if(status.get(one)==0)
         	{
         		System.out.println("slave Id: "+one+" disconnected, abondon all related tasks");
         		remove(one);
         		continue;
         	}
-        	status.put(one, 0);
+        	status.put(one, hh-1);
         	Message msg=new Message(msgType.HEART);
         	send(one,msg);
         }
@@ -373,7 +374,7 @@ public class Manager {
                 checkAlive();
             }
         };
-        monitor.schedule(task, 0, 20000);
+        monitor.schedule(task, 0, 5000);
     }
     public int slaveSize() {
     	return slaves.size();

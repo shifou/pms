@@ -65,7 +65,7 @@ public class Connection implements Runnable {
 					
 					//ipaddr=receiveMessage.getIp();
 					listenPort=receiveMessage.getDestPort();
-					Manager.manager.slaveStatus.put(slaveId, 1);
+					Manager.manager.slaveStatus.put(slaveId, 5);
 					ConcurrentHashMap<Integer, ProcessInfo> hold= new ConcurrentHashMap<Integer, ProcessInfo>();
 					Manager.manager.processes.put(slaveId, hold);
 					break;
@@ -100,7 +100,8 @@ public class Connection implements Runnable {
 	}
 
 	private void handleHEART(Message receiveMessage) {
-		Manager.manager.slaveStatus.put(slaveId, 1);
+		int st=Manager.manager.slaveStatus.get(slaveId);
+		Manager.manager.slaveStatus.put(slaveId, st+1);
 		
 	}
 
