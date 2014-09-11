@@ -191,20 +191,21 @@ public class Slave {
 				toSend.setProcessInfo(pI);
 				this.processes.remove(pID);
 				this.processThreads.remove(pID);
-				/*
+				
 				SlaveToSlave handler = new SlaveToSlave(toSlave, toSend);
 				new Thread(handler).start();
-				*/
-				ObjectOutputStream out= new ObjectOutputStream(toSlave.getOutputStream());
-				out.flush();
-				try {
-					out.writeObject(toSend);
-					out.flush();
-					//out.close();
-					//toSlave.close();
-				} catch (IOException e){
-					System.out.println("trying to write to another slave failed");
-				}
+				
+//				ObjectOutputStream out= new ObjectOutputStream(toSlave.getOutputStream());
+//				out.flush();
+//				try {
+//					out.writeObject(toSend);
+//					out.flush();
+//					//out.close();
+//					//toSlave.close();
+//				} catch (IOException e){
+//					System.out.println("trying to write to another slave failed");
+//				}
+				sendToServer(toSend);
 			} catch (IOException e) {
 				Message m = new Message(e.getMessage(), received.getProId(),
 						msgType.MIGRATEFAIL);
