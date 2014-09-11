@@ -190,6 +190,13 @@ public class Manager {
             System.out.println("the slave id is not a number");
             return;   
         }
+        try{
+            procId = Integer.valueOf(line[2]);
+            
+        }catch(Exception e){
+            System.out.println("the process id is not a number");
+            return;   
+        }
         if(slaves.containsKey(slaveId)==false){
             System.out.println("there is no slave with id number "+slaveId);
             return;
@@ -339,7 +346,7 @@ public class Manager {
         	send(one,msg);
         }
     }
-    public int send(Integer one, Message msg) {
+    public synchronized int send(Integer one, Message msg) {
     	try {
     			con.get(one).send(msg);
     		return 1;

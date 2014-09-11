@@ -42,7 +42,7 @@ public class Connection implements Runnable {
 				try {
 					receiveMessage = (Message) objInput.readObject();
 				} catch (ClassNotFoundException e) {
-					System.out.println("read message error");
+					//System.out.println("read disconnected message");
 					continue;
 				}
 				if(receiveMessage.getResponType()!=msgType.HEARTACK)
@@ -149,8 +149,10 @@ public class Connection implements Runnable {
 		{
 			if(mes.getResponType()!=msgType.HEART)
 			System.out.println("send to "+slaveId+"\t"+mes.getResponType());
-			objOutput.writeObject(mes);
-			objOutput.flush();
+
+				objOutput.writeObject(mes);
+				objOutput.flush();
+			
 		}catch(Exception e)
 		{
 			return 0;

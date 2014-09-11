@@ -40,6 +40,7 @@ public class CountWordsProcess implements MigratableProcess
 
 		try {
 			int sum=0;
+			int ln=1;
 			while ((!suspending) && (!killed)) {
 				String line = in.readLine();
 				System.out.println(line);
@@ -52,11 +53,11 @@ public class CountWordsProcess implements MigratableProcess
 				
 				String[] words = line.split(" ");
 				sum += words.length;
-				
-				
+				out.println("read lines "+ln+" total words: " + sum);
+				ln++;
 				// Make CountWordsProcess take longer so that we don't require extremely large files for interesting results
 				try {
-					Thread.sleep(100);
+					Thread.sleep(10000);
 				} catch (InterruptedException e) {
 					// ignore it
 				}

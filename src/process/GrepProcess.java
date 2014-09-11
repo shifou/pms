@@ -69,7 +69,7 @@ public class GrepProcess implements MigratableProcess
 	public void suspend()
 	{
 		suspending = true;
-		System.out.println("sssssss");
+		//System.out.println("sssssss");
 		while (suspending);
 	}
 

@@ -17,7 +17,7 @@ public class HeadProcess implements MigratableProcess
 	private static final long serialVersionUID = 80524725177656445L;
 	private TransactionalFileInputStream  inFile;
 	private TransactionalFileOutputStream outFile;
-	private String query;
+	private int num;
 
 	private volatile boolean suspending;
 	private volatile boolean killed;
@@ -28,8 +28,13 @@ public class HeadProcess implements MigratableProcess
 			System.out.println("usage: HeadProcess <number> <inputFile> <outputFile>");
 			throw new Exception("Invalid Arguments");
 		}
-		
-		query = args[0];
+		try
+		{
+		num = Integer.valueOf(args[0]);
+		}catch(Exception e)
+		{
+			System.out.println("please enter the integer number");
+		}
 		inFile = new TransactionalFileInputStream(args[1]);
 		outFile = new TransactionalFileOutputStream(args[2]);
 	}
@@ -40,24 +45,22 @@ public class HeadProcess implements MigratableProcess
 		DataInputStream in = new DataInputStream(inFile);
 
 		try {
-			int sum=0;
+			int ct=0;
 			while ((!suspending) && (!killed)) {
 				String line = in.readLine();
 				System.out.println(line);
 				if (line == null) 
 					{
-					out.println("Number of words total in the files: " + sum);
 					
 					break;
 					}
+				if(ct<num) ct++;
+				out.println(line);
 				
-				String[] words = line.split(" ");
-				sum += words.length;
 				
-				
-				// Make CountWordsProcess take longer so that we don't require extremely large files for interesting results
+				// Make Head take longer so that we don't require extremely large files for interesting results
 				try {
-					Thread.sleep(100);
+					Thread.sleep(10000);
 				} catch (InterruptedException e) {
 					// ignore it
 				}
