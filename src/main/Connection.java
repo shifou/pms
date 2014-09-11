@@ -78,7 +78,8 @@ public class Connection implements Runnable {
 					break;
 				}
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("read message error in connection");
 
 		}
@@ -114,7 +115,7 @@ public class Connection implements Runnable {
 			System.out.println("slave "+slaveId+" start process "+hold+" fail FOR"+receiveMessage.getStatusInfo());
 			break;
 		case STARTDONE:
-			Manager.manager.proID++;
+			//Manager.manager.proID++;
 			Manager.manager.slaves.put(slaveId, socket);
 			Manager.manager.addProcess(slaveId, hold,receiveMessage.getProcessInfo());
 			System.out.println("slave "+slaveId+" start process "+hold+" success");

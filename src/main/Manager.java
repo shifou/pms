@@ -151,26 +151,33 @@ public class Manager {
         } catch (SecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return;
 		} catch (NoSuchMethodException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return;
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return;
 		} catch (InstantiationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return;
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return;
 		} catch (InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return;
 		}
         ProcessInfo hold=new ProcessInfo(p,line[1],Manager.manager.proID,args,Status.RUNNING);
        
             Message msg = new Message(hold,Manager.manager.proID,msgType.START);
 			send(slaveId, msg);
+			Manager.manager.proID++;
         }
         
             
