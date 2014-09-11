@@ -28,6 +28,8 @@ public class SlaveToSlave implements Runnable {
 	public void run() {
 		try {
 			out.writeObject(this.toSend);
+			out.flush();
+			out.close();
 		} catch (IOException e){
 			
 		}
