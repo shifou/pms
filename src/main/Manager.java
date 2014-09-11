@@ -167,7 +167,7 @@ public class Manager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        ProcessInfo hold=new ProcessInfo(p,line[1],slaveId,args,Status.RUNNING);
+        ProcessInfo hold=new ProcessInfo(p,line[1],Manager.manager.proID,args,Status.RUNNING);
        
             Message msg = new Message(hold,Manager.manager.proID,msgType.START);
 			send(slaveId, msg);
@@ -261,7 +261,7 @@ public class Manager {
             return;
         }
         process.setStatus(Status.MIGRATING);
-        Message msg = new Message(sourceId, targetId, con.get(targetId).getIp());
+        Message msg = new Message(sourceId, targetId, procId,con.get(targetId).getIp(),con.get(targetId).getPort());
 		send(targetId,msg);
 			try {
 				Thread.sleep(1000);
@@ -431,6 +431,7 @@ public class Manager {
 		src.remove(proId);
 		processes.put(sourceID, src);
 		ConcurrentHashMap<Integer, ProcessInfo> des= processes.get(destID);
+		hold.setStatus(Status.RUNNING);
 		des.put(destID,hold);
 		processes.put(destID, des);
 	}

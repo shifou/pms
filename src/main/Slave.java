@@ -48,14 +48,14 @@ public class Slave {
 		try {
 			//System.out.println(s.serverIP+"\t"+s.serverPort);
 			Socket toServer = new Socket(s.serverIP, s.serverPort);
-			System.out.println("456");
+
 			s.serverOut = new ObjectOutputStream(toServer.getOutputStream());
 			s.serverOut.flush();
-			System.out.println("789");
+
 			s.serverIn = new ObjectInputStream(toServer.getInputStream());
 			
 			
-			System.out.println("123");
+			//System.out.println("123");
 		} catch (IOException e) {
 			System.exit(-1);
 		}
@@ -75,7 +75,7 @@ public class Slave {
 				case START:
 					s.handleStartProcess(recvMessage);
 					break;
-				case MIGRATEBEGIN:
+				case MIGRATENOTI:
 					s.handleMigration(recvMessage);
 					break;
 				case KILL:
@@ -122,12 +122,13 @@ public class Slave {
 		ProcessInfo pI = received.getProcessInfo();
 		//ProcessInfo p2=pI;
 		Message rep=new Message(pI,received.getProId(),msgType.STARTDONE);
-		
+		sendToServer(rep);
 		MigratableProcess p = pI.getProcess();
 		new Thread(p).start();
+		System.out.println("put PID: "+pI.getId());
 		this.processes.put(pI.getId(), pI);
 		//Message rep=new Message(pI,msgType.STARTDONE);
-		sendToServer(rep);
+		
 		}
 		catch(Exception e)
 		{
@@ -141,8 +142,11 @@ public class Slave {
 			try {
 				Socket toSlave = new Socket(received.getDestHost(),
 						received.getDestPort());
-				int pID = received.getProcessInfo().getId();
+				int pID = received.getProId();
+				System.out.println("try to migrate PID: "+pID);
 				ProcessInfo pI = this.processes.get(new Integer(pID));
+				//if(pI==null) System.out.println("++++++");
+				//if(pI.getProcess()==null) System.out.println("-------------");
 				pI.getProcess().suspend();
 				if (pI.getProcess().getInputStream() != null){
 					pI.getProcess().getInputStream().changeMigrated(true);
@@ -157,7 +161,9 @@ public class Slave {
 				new Thread(handler).start();
 
 			} catch (IOException e) {
-
+				Message m =new Message(e.getMessage(),received.getProId(),msgType.MIGRATEFAIL);
+				sendToServer(m);
+				
 			}
 		} else if (received.getDestID() == this.slaveID) {
 			try {
@@ -166,21 +172,28 @@ public class Slave {
 				Message rcvd = (Message) in.readObject();
 				ProcessInfo pI = rcvd.getProcessInfo();
 				new Thread(pI.getProcess()).start();
+				pI.setStatus(Status.RUNNING);
 				this.processes.put(pI.getId(), pI);
+				Message rep= new Message(msgType.MIGRATEDONE,pI.getId(),received.getSourceID(),received.getDestID());
+				sendToServer(rep);
 
 			} catch (IOException e) {
-
+				Message m =new Message(e.getMessage(),received.getProId(),msgType.MIGRATEFAIL);
+				sendToServer(m);
 			}catch (ClassNotFoundException e){
-				
+				Message m =new Message("read class error",received.getProId(),msgType.MIGRATEFAIL);
+				sendToServer(m);
 			}
 		}
 	}
 	
 	private void handleFirstConnection(Message received){
 		this.slaveID = received.getSlaveID();
+		System.out.println("slave get conId: "+this.slaveID);
 		Message m = new Message(msgType.CONNECT);
 		try {
 			m.setDestIP(InetAddress.getLocalHost());
+			m.setDestPort(myPort);
 			sendToServer(m);
 		} catch (IOException e){
 			

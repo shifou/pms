@@ -10,12 +10,11 @@ import java.lang.InterruptedException;
 import transIO.TransactionalFileInputStream;
 import transIO.TransactionalFileOutputStream;
 
-public class GrepProcess implements MigratableProcess
+public class HeadProcess implements MigratableProcess
 {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5827004168052851878L;
+
+
+	private static final long serialVersionUID = 80524725177656445L;
 	private TransactionalFileInputStream  inFile;
 	private TransactionalFileOutputStream outFile;
 	private String query;
@@ -23,12 +22,13 @@ public class GrepProcess implements MigratableProcess
 	private volatile boolean suspending;
 	private volatile boolean killed;
 
-	public GrepProcess(String args[]) throws Exception
+	public HeadProcess(String args[]) throws Exception
 	{
 		if (args.length != 3) {
-			System.out.println("usage: GrepProcess <queryString> <inputFile> <outputFile>");
+			System.out.println("usage: HeadProcess <number> <inputFile> <outputFile>");
 			throw new Exception("Invalid Arguments");
 		}
+		
 		query = args[0];
 		inFile = new TransactionalFileInputStream(args[1]);
 		outFile = new TransactionalFileOutputStream(args[2]);
@@ -40,18 +40,24 @@ public class GrepProcess implements MigratableProcess
 		DataInputStream in = new DataInputStream(inFile);
 
 		try {
+			int sum=0;
 			while ((!suspending) && (!killed)) {
 				String line = in.readLine();
 				System.out.println(line);
-				if (line == null) break;
+				if (line == null) 
+					{
+					out.println("Number of words total in the files: " + sum);
+					
+					break;
+					}
 				
-				if (line.contains(query)) {
-					out.println(line);
-				}
+				String[] words = line.split(" ");
+				sum += words.length;
 				
-				// Make grep take longer so that we don't require extremely large files for interesting results
+				
+				// Make CountWordsProcess take longer so that we don't require extremely large files for interesting results
 				try {
-					Thread.sleep(10000);
+					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					// ignore it
 				}
@@ -69,7 +75,6 @@ public class GrepProcess implements MigratableProcess
 	public void suspend()
 	{
 		suspending = true;
-		System.out.println("sssssss");
 		while (suspending);
 	}
 

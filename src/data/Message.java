@@ -37,11 +37,13 @@ public class Message implements Serializable {
 		type=tp;
 	}
 	// migrate notification
-	public Message(int sourceId2, int targetId, InetAddress ip) {
+	public Message(int sourceId2, int targetId, int id,InetAddress ip,int port) {
+		proId=id;
 		sourceID= sourceId2;
 		destID= targetId;
 		destIP=ip;
 		type=msgType.MIGRATENOTI;
+		destPort=port;
 	}
 	//start a process
 	public Message(ProcessInfo hold, int proId,msgType start) {
@@ -49,9 +51,23 @@ public class Message implements Serializable {
 		proInfo=hold;
 		this.proId=proId;
 	}
+	// migrate fail reason
 	public Message(String message, msgType startfail) {
 		statusInfo=message;
 		type=startfail;
+	}
+	// migrate fail result
+	public Message(String message, int id,msgType startfail) {
+		proId=id;
+		statusInfo=message;
+		type=startfail;
+	}
+	//migrate done
+	public Message(msgType migratedone, int id, int sourceID2, int destID2) {
+		type=migratedone;
+		proId=id;
+		sourceID=sourceID2;
+		destID=destID2;
 	}
 	public msgType getResponType() {
 		return this.type;

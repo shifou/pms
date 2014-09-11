@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Connection implements Runnable {
 	private InetAddress ipaddr;
+	private int listenPort;
 	private int slaveId;
 	private Socket socket;
 	private volatile boolean running;
@@ -50,6 +51,7 @@ public class Connection implements Runnable {
 				case CONNECT:
 					
 					ipaddr=receiveMessage.getIp();
+					listenPort=receiveMessage.getDestPort();
 					Manager.manager.slaveStatus.put(slaveId, 1);
 					ConcurrentHashMap<Integer, ProcessInfo> hold= new ConcurrentHashMap<Integer, ProcessInfo>();
 					Manager.manager.processes.put(slaveId, hold);
@@ -89,14 +91,15 @@ public class Connection implements Runnable {
 	}
 
 	private void handleMIGRATE(Message receiveMessage) {
-		int hold = receiveMessage.getProcessInfo().getId();
+		int hold = receiveMessage.getProId();
 		switch (receiveMessage.getResponType()) {
 		//case MIGRATEBEGIN:
 		case MIGRATEDONE:
-			System.out.println("slave "+slaveId+" migrate process "+hold+" to slave "+receiveMessage.getDestID());
+			System.out.println("slave "+slaveId+" migrate process "+hold+" from slave "+receiveMessage.getSourceID());
 			Manager.manager.transferProcess(receiveMessage.getSourceID(),receiveMessage.getDestID(),hold);
+			break;
 		case MIGRATEFAIL:
-			System.out.println("slave "+slaveId+" migrate process "+hold+" to slave "+receiveMessage.getDestID()+" fail FOR"+receiveMessage.getStatusInfo());
+			System.out.println("slave "+slaveId+" migrate process "+hold+" from slave "+receiveMessage.getSourceID()+" fail FOR"+receiveMessage.getStatusInfo());
 			//Manager.manager.getProcessOfSlave(slaveId)
 			break;
 		default:
@@ -162,5 +165,10 @@ public class Connection implements Runnable {
 	public InetAddress getIp() {
 		// TODO Auto-generated method stub
 		return ipaddr;
+	}
+
+	public int getPort() {
+		
+		return listenPort;
 	}
 }

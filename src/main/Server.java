@@ -50,7 +50,7 @@ public class Server implements Runnable{
 	            new Thread(slaveService).start();
 	            System.out.println("begin send");
 	            Manager.manager.con.put(conId, slaveService);
-	            Message msg= new Message(conId,msgType.CONNECT);
+	            Message msg= new Message(msgType.CONNECT,conId);
 	            Manager.manager.send(conId, msg);
 	             
 	             
