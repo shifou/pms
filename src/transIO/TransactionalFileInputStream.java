@@ -16,7 +16,7 @@ public class TransactionalFileInputStream extends InputStream implements Seriali
 	private static final long serialVersionUID = -212220946013637199L;
 
 	private File file;
-	private RandomAccessFile fileHandle;
+	private transient RandomAccessFile fileHandle;
 	private long fileOffset;
 	private boolean migrated;
 	

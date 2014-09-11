@@ -13,7 +13,7 @@ public class TransactionalFileOutputStream extends OutputStream implements Seria
 	private static final long serialVersionUID = 4576890066480014205L;
 
 	private File file;
-	private RandomAccessFile fileHandle;
+	private transient RandomAccessFile fileHandle;
 	private long fileOffset;
 	private boolean migrated;
 	

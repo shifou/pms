@@ -120,13 +120,14 @@ public class Slave {
 		try
 		{
 		ProcessInfo pI = received.getProcessInfo();
+		//ProcessInfo p2=pI;
 		Message rep=new Message(pI,received.getProId(),msgType.STARTDONE);
-		sendToServer(rep);
+		
 		MigratableProcess p = pI.getProcess();
 		new Thread(p).start();
 		this.processes.put(pI.getId(), pI);
 		//Message rep=new Message(pI,msgType.STARTDONE);
-		
+		sendToServer(rep);
 		}
 		catch(Exception e)
 		{
