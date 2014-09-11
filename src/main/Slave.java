@@ -113,6 +113,10 @@ public class Slave {
 				case HEART:
 					s.handlePollingReq(recvMessage);
 					break;
+				case SHUTDOWN:
+					System.out.println("server turn down,close...");
+					s.terminate();
+					System.exit(0);
 				default:
 					System.out
 							.println("Unrecognized message received from server at Slave: "
@@ -282,5 +286,14 @@ public class Slave {
 
 	public int getSlaveID() {
 		return this.slaveID;
+	}
+	private void terminate() {
+
+		try {
+			this.toServer.close();
+			System.gc();
+		} catch (IOException e) {
+
+		}
 	}
 }

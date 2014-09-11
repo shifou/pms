@@ -83,7 +83,13 @@ public class Manager {
 
 				handleHelp(hold);
 			} else if (hold[0].equals("shutdown")) {
-
+				if(slaves.size()!=0)
+				{
+					Message msg=new Message(msgType.SHUTDOWN);
+					ConcurrentHashMap<Integer, Socket> slaveList = getSlaves();
+					for (int i : slaveList.keySet())
+						send(i,msg);
+				}
 				terminate();
 				System.out.println("terminating...");
 				System.exit(0);

@@ -18,4 +18,5 @@ public enum msgType {
 	KILL,
 	KILLFAIL,
 	KILLDONE,
+	SHUTDOWN
 }
