@@ -4,6 +4,7 @@ import data.Message;
 import data.ProcessInfo;
 import data.msgType;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -40,9 +41,21 @@ public class Connection implements Runnable {
 			Message receiveMessage;
 			while (running) {
 				try {
+
 					receiveMessage = (Message) objInput.readObject();
+					
 				} catch (ClassNotFoundException e) {
 					//System.out.println("read disconnected message");
+					continue;
+				}
+				catch(EOFException e)
+				{
+					System.out.println("detect disconnected message");
+					continue;
+				}
+				catch(Exception e)
+				{
+					System.out.println("-----");
 					continue;
 				}
 				if(receiveMessage.getResponType()!=msgType.HEARTACK)
@@ -50,7 +63,7 @@ public class Connection implements Runnable {
 				switch (receiveMessage.getResponType()) {
 				case CONNECT:
 					
-					ipaddr=receiveMessage.getIp();
+					//ipaddr=receiveMessage.getIp();
 					listenPort=receiveMessage.getDestPort();
 					Manager.manager.slaveStatus.put(slaveId, 1);
 					ConcurrentHashMap<Integer, ProcessInfo> hold= new ConcurrentHashMap<Integer, ProcessInfo>();
@@ -80,7 +93,7 @@ public class Connection implements Runnable {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("read message error in connection");
+			System.out.println("message error in handle");
 
 		}
 
@@ -101,7 +114,7 @@ public class Connection implements Runnable {
 			break;
 		case MIGRATEFAIL:
 			System.out.println("slave "+slaveId+" migrate process "+hold+" from slave "+receiveMessage.getSourceID()+" fail FOR"+receiveMessage.getStatusInfo());
-			//Manager.manager.getProcessOfSlave(slaveId)
+			Manager.manager.keepRun(slaveId,hold);
 			break;
 		default:
 			break;
@@ -146,6 +159,8 @@ public class Connection implements Runnable {
 	}
 
 	public int send(Message mes) throws IOException {
+		synchronized(this.socket)
+		{
 		try
 		{
 			if(mes.getResponType()!=msgType.HEART)
@@ -159,6 +174,7 @@ public class Connection implements Runnable {
 			return 0;
 		}
 		return 1;
+		}
 	}
 
 	public void stop() {
@@ -173,5 +189,10 @@ public class Connection implements Runnable {
 	public int getPort() {
 		
 		return listenPort;
+	}
+
+	public void setIp(InetAddress inetAddress) {
+		// TODO Auto-generated method stub
+		ipaddr=inetAddress;
 	}
 }

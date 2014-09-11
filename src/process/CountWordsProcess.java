@@ -16,21 +16,19 @@ public class CountWordsProcess implements MigratableProcess
 
 	private TransactionalFileInputStream  inFile;
 	private TransactionalFileOutputStream outFile;
-	private String query;
 
 	private volatile boolean suspending;
 	private volatile boolean killed;
 
 	public CountWordsProcess(String args[]) throws Exception
 	{
-		if (args.length != 3) {
-			System.out.println("usage: CountWordsProcess <queryString> <inputFile> <outputFile>");
+		if (args.length != 2) {
+			System.out.println("usage: CountWordsProcess <inputFile> <outputFile>");
 			throw new Exception("Invalid Arguments");
 		}
 		
-		query = args[0];
-		inFile = new TransactionalFileInputStream(args[1]);
-		outFile = new TransactionalFileOutputStream(args[2]);
+		inFile = new TransactionalFileInputStream(args[0]);
+		outFile = new TransactionalFileOutputStream(args[1]);
 	}
 
 	public void run()

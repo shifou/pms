@@ -20,7 +20,7 @@ public class SlaveToSlave implements Runnable {
 			this.out = new ObjectOutputStream(this.toSlave.getOutputStream());
 			this.out.flush();
 		} catch (IOException e){
-			
+			System.out.println("create slave to slave socket failed");
 		}
 	}
 	
@@ -29,9 +29,10 @@ public class SlaveToSlave implements Runnable {
 		try {
 			out.writeObject(this.toSend);
 			out.flush();
-			out.close();
+			//out.close();
+			//toSlave.close();
 		} catch (IOException e){
-			
+			System.out.println("trying to write to another slave failed");
 		}
 	}
 

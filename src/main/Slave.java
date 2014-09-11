@@ -26,6 +26,7 @@ public class Slave {
 	private ConcurrentHashMap<Integer, ProcessInfo> processes;
 	private ConcurrentHashMap<Integer, Thread> processThreads;
 	private Timer statusChecker;
+	private Socket toServer;
 
 	public Slave(int serverPort, String serverIP, int myPort) {
 		try {
@@ -36,7 +37,6 @@ public class Slave {
 			this.clientListener = new ServerSocket(this.myPort);
 			this.processes = new ConcurrentHashMap<Integer, ProcessInfo>();
 			this.processThreads = new ConcurrentHashMap<Integer, Thread>();
-		
 
 		} catch (IOException e) {
 
@@ -47,33 +47,33 @@ public class Slave {
 		}
 	}
 
-	private void startTimer(){
+	private void startTimer() {
 		this.statusChecker = new Timer(true);
-		TimerTask task = new TimerTask(){
-			public void run(){
+		TimerTask task = new TimerTask() {
+			public void run() {
 				checkProcessStatus();
 			}
 		};
 		this.statusChecker.schedule(task, 0, 1000);
 	}
-	
-	private void checkProcessStatus(){
-		for (int i : this.processThreads.keySet()){
+
+	private void checkProcessStatus() {
+		for (int i : this.processThreads.keySet()) {
 			Thread t = this.processThreads.get(i);
-			if (!t.isAlive()){
+			if (!t.isAlive()) {
 				this.processThreads.remove(i);
 				Message m = new Message(i, msgType.FINISH);
 				this.sendToServer(m);
 			}
 		}
 	}
-	
+
 	public static void main(String args[]) {
 		Slave s = new Slave(Integer.parseInt(args[0]), args[1],
 				Integer.parseInt(args[2]));
 		try {
 			Socket toServer = new Socket(s.serverIP, s.serverPort);
-
+			s.toServer = toServer;
 			s.serverOut = new ObjectOutputStream(toServer.getOutputStream());
 			s.serverOut.flush();
 
@@ -88,7 +88,9 @@ public class Slave {
 
 			Message recvMessage;
 			try {
+
 				recvMessage = (Message) s.serverIn.readObject();
+
 				if (recvMessage.getResponType() != msgType.HEART)
 					System.out.println("worker message received: id "
 							+ recvMessage.getResponType());
@@ -135,17 +137,15 @@ public class Slave {
 
 	private void handleKillProcess(Message received) {
 		int pid = received.getProId();
-		try
-		{
-		MigratableProcess p = this.processes.get(pid).getProcess();
-		p.kill();
-		this.processes.remove(pid);
-		this.processThreads.remove(pid);
-		Message m= new Message(pid,msgType.KILLDONE);
-		sendToServer(m);
-		}catch (Exception e)
-		{
-			Message m= new Message(pid,msgType.KILLFAIL);
+		try {
+			MigratableProcess p = this.processes.get(pid).getProcess();
+			p.kill();
+			this.processes.remove(pid);
+			this.processThreads.remove(pid);
+			Message m = new Message(pid, msgType.KILLDONE);
+			sendToServer(m);
+		} catch (Exception e) {
+			Message m = new Message(pid, msgType.KILLFAIL);
 			sendToServer(m);
 		}
 	}
@@ -173,8 +173,10 @@ public class Slave {
 	private void handleMigration(Message received) {
 		if (received.getSourceID() == this.slaveID) {
 			try {
+				System.out.println("try to connect to slave "+received.getDestHost()+" port: "+received.getDestPort());
 				Socket toSlave = new Socket(received.getDestHost(),
 						received.getDestPort());
+				System.out.println("create socket succeed");
 				int pID = received.getProId();
 				ProcessInfo pI = this.processes.get(new Integer(pID));
 				pI.getProcess().suspend();
@@ -189,9 +191,20 @@ public class Slave {
 				toSend.setProcessInfo(pI);
 				this.processes.remove(pID);
 				this.processThreads.remove(pID);
+				/*
 				SlaveToSlave handler = new SlaveToSlave(toSlave, toSend);
 				new Thread(handler).start();
-
+				*/
+				ObjectOutputStream out= new ObjectOutputStream(toSlave.getOutputStream());
+				out.flush();
+				try {
+					out.writeObject(toSend);
+					out.flush();
+					//out.close();
+					//toSlave.close();
+				} catch (IOException e){
+					System.out.println("trying to write to another slave failed");
+				}
 			} catch (IOException e) {
 				Message m = new Message(e.getMessage(), received.getProId(),
 						msgType.MIGRATEFAIL);
@@ -200,10 +213,13 @@ public class Slave {
 			}
 		} else if (received.getDestID() == this.slaveID) {
 			try {
+				System.out.println("slave begin listen at "+myPort+" for migration");
 				Socket toSlave = this.clientListener.accept();
 				ObjectInputStream in = new ObjectInputStream(
 						toSlave.getInputStream());
+				System.out.println("listen succeed for migration");
 				Message rcvd = (Message) in.readObject();
+				//toSlave.close();
 				ProcessInfo pI = rcvd.getProcessInfo();
 				Thread t = new Thread(pI.getProcess());
 				t.start();
@@ -240,16 +256,19 @@ public class Slave {
 	}
 
 	private synchronized void sendToServer(Message s) {
-		if (s.getResponType() != msgType.HEARTACK)
-			System.out.println("send message: " + s.getResponType() + "\t");
-		try {
-			
+		synchronized (this.toServer) {
+			if (s.getResponType() != msgType.HEARTACK)
+				System.out.println("send message: " + s.getResponType() + "\t");
+			try {
+
 				this.serverOut.writeObject(s);
 				this.serverOut.flush();
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("slave send fail");
+			}
+
+			catch (Exception e) {
+				e.printStackTrace();
+				System.out.println("slave send fail");
+			}
 		}
 	}
 

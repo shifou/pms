@@ -144,7 +144,7 @@ public class Manager {
         try{
         	Class<?> obj = Class.forName("process."+line[1]);
             Constructor<?> objConstructor = obj.getConstructor(String[].class);
-        	    p = (MigratableProcess) objConstructor.newInstance(new Object[] {args});
+        	p = (MigratableProcess) objConstructor.newInstance(new Object[] {args});
         }catch(ClassNotFoundException e){
             System.out.println("no such process class "+line[1]);
             return;
@@ -275,6 +275,8 @@ public class Manager {
             return;
         }
         process.setStatus(Status.MIGRATING);
+        proList.put(procId, process);
+        processes.put(sourceId, proList);
         Message msg = new Message(sourceId, targetId, procId,con.get(targetId).getIp(),con.get(targetId).getPort());
 		send(targetId,msg);
 			try {
@@ -371,7 +373,7 @@ public class Manager {
                 checkAlive();
             }
         };
-        monitor.schedule(task, 0, 5000);
+        monitor.schedule(task, 0, 20000);
     }
     public int slaveSize() {
     	return slaves.size();
@@ -427,14 +429,28 @@ public class Manager {
     }
 
 	public void addProcess(int slaveId, int id,ProcessInfo info) {
-		ConcurrentHashMap<Integer, ProcessInfo> hold= processes.get(slaveId);
+	    
+	    	//System.out.println("----\t"+processes.contains(slaveId)+"\t"+(info==null));
+		ConcurrentHashMap<Integer, ProcessInfo> hold;
+		if(processes.containsKey(slaveId)==false)
+		{
+			hold=new ConcurrentHashMap<Integer, ProcessInfo>();
+			processes.put(slaveId, hold);
+		}
+		else {
+			hold= processes.get(slaveId);
+		}
 		hold.put(id, info);
 		processes.put(slaveId, hold);
+		//System.out.println("----\t"+processes.containsKey(key));
+		
+		
 		
 	}
 
 	public void removeProcess(int slaveId, int id) {
 		ConcurrentHashMap<Integer, ProcessInfo> hold= processes.get(slaveId);
+		System.out.println("begin remove: "+id+" in slave "+slaveId+"\t"+hold.containsKey(id));
 		hold.remove(id);
 		processes.put(slaveId, hold);
 	}
@@ -442,11 +458,21 @@ public class Manager {
 		
 		ConcurrentHashMap<Integer, ProcessInfo> src= processes.get(sourceID);
 		ProcessInfo hold= src.get(proId);
+		System.out.println("migrate: "+proId+" in slave "+sourceID+"\t"+src.containsKey(proId));
 		src.remove(proId);
 		processes.put(sourceID, src);
 		ConcurrentHashMap<Integer, ProcessInfo> des= processes.get(destID);
 		hold.setStatus(Status.RUNNING);
-		des.put(destID,hold);
+		des.put(proId,hold);
 		processes.put(destID, des);
+	}
+
+	public void keepRun(int slaveId, int hold) {
+		ConcurrentHashMap<Integer, ProcessInfo> src= processes.get(slaveId);
+		ProcessInfo fk=src.get(hold);
+		fk.setStatus(Status.RUNNING);
+		src.put(hold,fk);
+		processes.put(slaveId, src);
+		
 	}
 }
