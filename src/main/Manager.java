@@ -95,7 +95,7 @@ public class Manager {
         else{
         	ConcurrentHashMap<Integer,Socket> slaveList = getSlaves();
             for(int i : slaveList.keySet())
-                System.out.println("Slave ID: "+i+"  IP Address: "+slaveList.get(i).getInetAddress()+" port: "+slaveList.get(i).getPort());
+                System.out.println("Slave ID: "+i+"  IP Address: "+slaveList.get(i).getInetAddress()+" port: "+slaveList.get(i).getPort()+" health: "+slaveStatus.get(i));
         }
     }
     
@@ -296,6 +296,7 @@ public class Manager {
         System.out.println("start <process name> <slaveId> <args[]>  : start the process on one slave");
         System.out.println("migrate <processId> <source slaveId> <target slaveId> : migrate process from one slave to another slave");
         System.out.println("kill <processId> <slaveId>: kill the process in slave");
+        System.out.println("shutdown: quit");
     }
     public void remove(int one){
     	
@@ -451,7 +452,7 @@ public class Manager {
 
 	public void removeProcess(int slaveId, int id) {
 		ConcurrentHashMap<Integer, ProcessInfo> hold= processes.get(slaveId);
-		System.out.println("begin remove: "+id+" in slave "+slaveId+"\t"+hold.containsKey(id));
+		//System.out.println("begin remove: "+id+" in slave "+slaveId+"\t"+hold.containsKey(id));
 		hold.remove(id);
 		processes.put(slaveId, hold);
 	}
@@ -459,7 +460,7 @@ public class Manager {
 		
 		ConcurrentHashMap<Integer, ProcessInfo> src= processes.get(sourceID);
 		ProcessInfo hold= src.get(proId);
-		System.out.println("migrate: "+proId+" in slave "+sourceID+"\t"+src.containsKey(proId));
+		//System.out.println("migrate: "+proId+" in slave "+sourceID+"\t"+src.containsKey(proId));
 		src.remove(proId);
 		processes.put(sourceID, src);
 		ConcurrentHashMap<Integer, ProcessInfo> des= processes.get(destID);
