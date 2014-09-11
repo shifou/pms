@@ -12,6 +12,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.net.SocketException;
 public class Manager {
@@ -139,15 +141,32 @@ public class Manager {
         }
         String processName = line[1];
         MigratableProcess p=null;
-        if(processName.equals("GrepProcess"))
-        {
-        	try {
-				p=new GrepProcess(args);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				System.out.println("process class not found");
-			}
-        }
+        try{
+        	Class<?> obj = Class.forName("process."+line[1]);
+            Constructor<?> objConstructor = obj.getConstructor(String[].class);
+        	    p = (MigratableProcess) objConstructor.newInstance(new Object[] {args});
+        }catch(ClassNotFoundException e){
+            System.out.println("no such process class "+line[1]);
+            return;
+        } catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         ProcessInfo hold=new ProcessInfo(p,line[1],slaveId,args,Status.RUNNING);
        
             Message msg = new Message(hold,Manager.manager.proID,msgType.START);
