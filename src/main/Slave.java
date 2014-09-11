@@ -61,6 +61,7 @@ public class Slave {
 		for (int i : this.processThreads.keySet()){
 			Thread t = this.processThreads.get(i);
 			if (!t.isAlive()){
+				this.processThreads.remove(i);
 				Message m = new Message(i, msgType.FINISH);
 				this.sendToServer(m);
 			}
@@ -133,10 +134,19 @@ public class Slave {
 
 	private void handleKillProcess(Message received) {
 		int pid = received.getProId();
+		try
+		{
 		MigratableProcess p = this.processes.get(pid).getProcess();
 		p.kill();
 		this.processes.remove(pid);
 		this.processThreads.remove(pid);
+		Message m= new Message(pid,msgType.KILLDONE);
+		sendToServer(m);
+		}catch (Exception e)
+		{
+			Message m= new Message(pid,msgType.KILLFAIL);
+			sendToServer(m);
+		}
 	}
 
 	private void handleStartProcess(Message received) {
@@ -176,6 +186,8 @@ public class Slave {
 				Message toSend = new Message(msgType.MIGRATEBEGIN);
 				pI.setStatus(Status.MIGRATING);
 				toSend.setProcessInfo(pI);
+				this.processes.remove(pID);
+				this.processThreads.remove(pID);
 				SlaveToSlave handler = new SlaveToSlave(toSlave, toSend);
 				new Thread(handler).start();
 
@@ -226,14 +238,14 @@ public class Slave {
 
 	}
 
-	private void sendToServer(Message s) {
+	private synchronized void sendToServer(Message s) {
 		if (s.getResponType() != msgType.HEARTACK)
 			System.out.println("send message: " + s.getResponType() + "\t");
 		try {
-			synchronized(this.serverOut){
+			
 				this.serverOut.writeObject(s);
 				this.serverOut.flush();
-			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("slave send fail");

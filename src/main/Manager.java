@@ -428,7 +428,7 @@ public class Manager {
 
 	public void removeProcess(int slaveId, int id) {
 		ConcurrentHashMap<Integer, ProcessInfo> hold= processes.get(slaveId);
-		hold.remove(slaveId);
+		hold.remove(id);
 		processes.put(slaveId, hold);
 	}
 	public void transferProcess(int sourceID, int destID, int proId) {
