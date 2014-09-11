@@ -25,6 +25,8 @@ public class CountWordsProcess implements MigratableProcess
 	public CountWordsProcess(String args[]) throws Exception
 	{
 		if (args.length != 2) {
+			for(int i=0;i<args.length;i++)
+			System.out.println(args[i]);
 			System.out.println("usage: CountWordsProcess <inputFile> <outputFile>");
 			throw new Exception("Invalid Arguments");
 		}
@@ -43,7 +45,7 @@ public class CountWordsProcess implements MigratableProcess
 			int ln=1;
 			while ((!suspending) && (!killed)) {
 				String line = in.readLine();
-				System.out.println(line);
+				
 				if (line == null) 
 					{
 					out.println("Number of words total in the files: " + sum);
@@ -53,6 +55,7 @@ public class CountWordsProcess implements MigratableProcess
 				
 				String[] words = line.split(" ");
 				sum += words.length;
+				System.out.println("read lines "+ln+" total words: " + sum);
 				out.println("read lines "+ln+" total words: " + sum);
 				ln++;
 				// Make CountWordsProcess take longer so that we don't require extremely large files for interesting results

@@ -54,8 +54,16 @@ public class Manager {
 				System.out.println("IO Error, try again");
 				// closeConsle();
 			}
+			String[] temp = line.trim().split(" ");
 
-			String[] hold = line.split(" ");
+			String use=temp[0];
+			for(int i=1;i<temp.length;i++)
+				if(temp[i].equals("")==false)
+				{
+					use+=" ";
+					use+=temp[i];
+				}
+			String []hold=use.split(" ");
 			if (hold[0].equals("start")) {
 				handleStartProcess(hold);
 			} else if (hold[0].equals("migrate")) {
@@ -135,13 +143,45 @@ public class Manager {
 			return;
 
 		}
-
+		for(int i=0;i<line.length;i++)
+		{
+			System.out.print('#');
+			System.out.print(line[i]);
+			System.out.println('#');
+		}
 		String[] args = new String[line.length - 3];
 		for (int i = 3; i < line.length; i++) {
 			args[i - 3] = line[i];
 		}
 		String processName = line[1];
 		MigratableProcess p = null;
+		if(line[1].equals("CountWordsProcess"))
+			try {
+				p=new CountWordsProcess(args);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		else if(line[1].equals("HeadProcess"))
+			try {
+				p=new HeadProcess(args);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		else if(line[1].equals("GrepProcess"))
+			try {
+				p=new GrepProcess(args);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		else
+		{
+			System.out.println("unknow type process, quit start command");
+			return;
+		}
+		/*
 		try {
 			Class<?> obj = Class.forName("process." + line[1]);
 			Constructor<?> objConstructor = obj.getConstructor(String[].class);
@@ -175,6 +215,7 @@ public class Manager {
 			e.printStackTrace();
 			return;
 		}
+		*/
 		ProcessInfo hold = new ProcessInfo(p, line[1], Manager.manager.proID,
 				args, Status.RUNNING);
 
@@ -287,6 +328,7 @@ public class Manager {
 		}
 
 		send(sourceId, msg);
+		
 	}
 
 	private void handleHelp(String[] line) {
