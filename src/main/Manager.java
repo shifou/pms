@@ -161,6 +161,7 @@ public class Manager {
 		}
 		String processName = line[1];
 		MigratableProcess p = null;
+		/*
 		if(line[1].equals("CountWordsProcess"))
 			try {
 				p=new CountWordsProcess(args);
@@ -187,7 +188,8 @@ public class Manager {
 			System.out.println("unknow type process, quit start command");
 			return;
 		}
-		/*
+		*/
+		
 		try {
 			Class<?> obj = Class.forName("process." + line[1]);
 			Constructor<?> objConstructor = obj.getConstructor(String[].class);
@@ -221,7 +223,7 @@ public class Manager {
 			e.printStackTrace();
 			return;
 		}
-		*/
+		
 		ProcessInfo hold = new ProcessInfo(p, line[1], Manager.manager.proID,
 				args, Status.RUNNING);
 
