@@ -1,7 +1,4 @@
-/*
- * Server class used for listening from slaves join information 
- * and create the connection thread
- */
+
 package main;
 import java.io.IOException;
 import java.net.Socket;
@@ -12,6 +9,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import data.Message;
 import data.ProcessInfo;
 import data.msgType;
+
+/*
+ * Server class used for listening from slaves join information 
+ * and create the connection thread
+ */
 public class Server implements Runnable{
 	private int conId;
 	private int port;
@@ -25,7 +27,6 @@ public class Server implements Runnable{
         try {
          serverSocket = new ServerSocket((short)portNum);
      } catch (IOException e) {
-         // TODO Auto-generated catch block
          e.printStackTrace();
          System.out.println("failed to create the socket server");
          System.exit(0);
@@ -60,7 +61,6 @@ public class Server implements Runnable{
 	             
 	             
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} 
              conId++;
@@ -69,7 +69,6 @@ public class Server implements Runnable{
      try {
     	 serverSocket.close();
      } catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
       System.out.println("socket Server failed to close");
   }

@@ -1,7 +1,3 @@
-/*
- * Main class for accepting the commandline and send to slaves through server instance
- * have heartbeat thread to check the slavestatus every 5 seconds with 5 failure chance.
- */
 package main;
 
 import main.Server;
@@ -22,6 +18,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.net.SocketException;
 
+/*
+ * Main class for accepting the commandline and send to slaves through server instance
+ * have heartbeat thread to check the slavestatus every 5 seconds with 5 failure chance.
+ */
 public class Manager {
 	Server server;
 	private int port;
@@ -52,7 +52,6 @@ public class Manager {
 
 			} catch (IOException e) {
 				System.out.println("IO Error, try again");
-				// closeConsle();
 			}
 			String[] temp = line.trim().split(" ");
 

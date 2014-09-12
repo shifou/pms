@@ -7,9 +7,7 @@ import java.io.Serializable;
 import java.io.RandomAccessFile;
 
 public class TransactionalFileOutputStream extends OutputStream implements Serializable{	
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 4576890066480014205L;
 
 	private File file;

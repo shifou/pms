@@ -1,10 +1,11 @@
+package data;
+import java.io.Serializable;
+import java.net.InetAddress;
+
 /*
  * Message class is a class used for communication through network 
  * including the ProcessInfo and other information, each time we will send one message
  */
-package data;
-import java.io.Serializable;
-import java.net.InetAddress;
 public class Message implements Serializable {
 	
 	private static final long serialVersionUID = -2553768344528279980L;

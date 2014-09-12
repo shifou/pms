@@ -1,6 +1,3 @@
-/*
- * slave class for handling all the message commands from server and reply accordingly.
- */
 package main;
 
 import java.io.IOException;
@@ -16,6 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import process.MigratableProcess;
 import data.*;
 
+/*
+ * slave class for handling all the message commands from server and reply accordingly.
+ */
 public class Slave {
 
 	private ServerSocket clientListener;
@@ -160,7 +160,6 @@ public class Slave {
 	private void handleStartProcess(Message received) {
 		try {
 			ProcessInfo pI = received.getProcessInfo();
-			// ProcessInfo p2=pI;
 			Message rep = new Message(pI, received.getProId(),
 					msgType.STARTDONE);
 			sendToServer(rep);
@@ -201,17 +200,7 @@ public class Slave {
 				
 				SlaveToSlave handler = new SlaveToSlave(toSlave, toSend);
 				new Thread(handler).start();
-				
-//				ObjectOutputStream out= new ObjectOutputStream(toSlave.getOutputStream());
-//				out.flush();
-//				try {
-//					out.writeObject(toSend);
-//					out.flush();
-//					//out.close();
-//					//toSlave.close();
-//				} catch (IOException e){
-//					System.out.println("trying to write to another slave failed");
-//				}
+
 				sendToServer(toSend);
 			} catch (IOException e) {
 				Message m = new Message(e.getMessage(), received.getProId(),
@@ -227,7 +216,6 @@ public class Slave {
 						toSlave.getInputStream());
 				System.out.println("listen succeed for migration");
 				Message rcvd = (Message) in.readObject();
-				//toSlave.close();
 				ProcessInfo pI = rcvd.getProcessInfo();
 				Thread t = new Thread(pI.getProcess());
 				t.start();

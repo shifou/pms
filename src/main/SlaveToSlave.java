@@ -32,8 +32,6 @@ public class SlaveToSlave implements Runnable {
 		try {
 			out.writeObject(this.toSend);
 			out.flush();
-			//out.close();
-			//toSlave.close();
 		} catch (IOException e){
 			System.out.println("trying to write to another slave failed");
 		}
