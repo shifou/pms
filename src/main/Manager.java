@@ -149,12 +149,7 @@ public class Manager {
 			return;
 
 		}
-		for(int i=0;i<line.length;i++)
-		{
-			System.out.print('#');
-			System.out.print(line[i]);
-			System.out.println('#');
-		}
+		
 		String[] args = new String[line.length - 3];
 		for (int i = 3; i < line.length; i++) {
 			args[i - 3] = line[i];
