@@ -1,6 +1,3 @@
-/*
- * count the total words number in files
- */
 package process;
 import java.io.PrintStream;
 import java.io.EOFException;
@@ -12,6 +9,9 @@ import java.lang.InterruptedException;
 import transIO.TransactionalFileInputStream;
 import transIO.TransactionalFileOutputStream;
 
+/*
+ * count the total words number in files
+ */
 public class CountWordsProcess implements MigratableProcess
 {
 	private static final long serialVersionUID = 718071586147799050L;
@@ -55,7 +55,7 @@ public class CountWordsProcess implements MigratableProcess
 				
 				String[] words = line.split(" ");
 				sum += words.length;
-				System.out.println("read lines "+ln+" total words: " + sum);
+				System.out.println("To verify migration: Read line "+ln+" total words: " + sum);
 				out.println("read lines "+ln+" total words: " + sum);
 				ln++;
 				// Make CountWordsProcess take longer so that we don't require extremely large files for interesting results
@@ -68,7 +68,7 @@ public class CountWordsProcess implements MigratableProcess
 		} catch (EOFException e) {
 			System.out.println("end of file");
 		} catch (IOException e) {
-			System.out.println ("GrepProcess: Error: " + e);
+			System.out.println ("CountWordsProcess: Error: " + e);
 		}
 
 

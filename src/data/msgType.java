@@ -1,8 +1,8 @@
+package data;
+
 /*
  * Define msgType for different kinds of message
  */
-package data;
-
 public enum msgType {
 	START,
 	CONNECT,

@@ -1,6 +1,3 @@
-/*
- * display the first N line strings
- */
 package process;
 import java.io.PrintStream;
 import java.io.EOFException;
@@ -12,6 +9,9 @@ import java.lang.InterruptedException;
 import transIO.TransactionalFileInputStream;
 import transIO.TransactionalFileOutputStream;
 
+/*
+ * display the first N lines in the given file
+ */
 public class HeadProcess implements MigratableProcess
 {
 
@@ -50,12 +50,12 @@ public class HeadProcess implements MigratableProcess
 			int ct=0;
 			while ((!suspending) && (!killed)) {
 				String line = in.readLine();
-				System.out.println(line);
 				if (line == null) 
 					{
 					
 					break;
 					}
+				System.out.println("To verify migration: "+line);
 				if(ct<num) ct++;
 				out.println(line);
 				
@@ -70,7 +70,7 @@ public class HeadProcess implements MigratableProcess
 		} catch (EOFException e) {
 			System.out.println("end of file");
 		} catch (IOException e) {
-			System.out.println ("GrepProcess: Error: " + e);
+			System.out.println ("HeadProcess: Error: " + e);
 		}
 
 
@@ -85,13 +85,11 @@ public class HeadProcess implements MigratableProcess
 
 	@Override
 	public TransactionalFileInputStream getInputStream() {
-		// TODO Auto-generated method stub
 		return this.inFile;
 	}
 
 	@Override
 	public TransactionalFileOutputStream getOutputStream() {
-		// TODO Auto-generated method stub
 		return this.outFile;
 	}
 

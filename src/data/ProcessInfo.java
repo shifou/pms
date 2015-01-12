@@ -1,17 +1,14 @@
-/*
- * define the class that we use to save the process information for migration 
- */
 package data;
 
 import java.io.Serializable;
 
 import process.MigratableProcess;
 
-
+/*
+ * define the class that we use to save the process information for migration 
+ */
 public class ProcessInfo implements Serializable {
-    /**
-	 * 
-	 */
+    
 	private static final long serialVersionUID = 4034010548176885851L;
 	private int proId;
     private String proName;

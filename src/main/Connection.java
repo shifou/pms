@@ -1,7 +1,3 @@
-/*
- * connection class is the listening thread getting messgae from one specific slave
- * and according to the messagetype we go different handlers
- */
 package main;
 
 import data.Message;
@@ -18,7 +14,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 
-
+/*
+ * connection class is the listening thread getting messgae from one specific slave
+ * and according to the messagetype we go different handlers
+ */
 public class Connection implements Runnable {
 	private InetAddress ipaddr;
 	private int listenPort;

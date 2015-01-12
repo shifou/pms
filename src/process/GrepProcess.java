@@ -69,19 +69,16 @@ public class GrepProcess implements MigratableProcess
 	public void suspend()
 	{
 		suspending = true;
-		//System.out.println("sssssss");
 		while (suspending);
 	}
 
 	@Override
 	public TransactionalFileInputStream getInputStream() {
-		// TODO Auto-generated method stub
 		return this.inFile;
 	}
 
 	@Override
 	public TransactionalFileOutputStream getOutputStream() {
-		// TODO Auto-generated method stub
 		return this.outFile;
 	}
 
